@@ -13,24 +13,14 @@ resource "aws_vpc" "eksvpc" {
   enable_dns_hostnames = true
 }
 
-# resource "aws_subnet" "db" {
-#   vpc_id     = aws_vpc.eksvpc.id
-#   cidr_block = "172.16.45.0/24"
-
-#   tags = {
-#     Name = "db"
-#     createdby = "tspencer"
-#   }
-# }
 resource "aws_subnet" "eks1" {
   vpc_id     = aws_vpc.eksvpc.id
   cidr_block = "172.16.43.0/24"
   availability_zone = "us-east-2b"
 
   tags = {
-    Name = "tspencer-eks1"
-    createdby = "tspencer"
-    "kubernetes.io/cluster/ekstest" = "shared"
+    Name = "tspencer-eks1",
+    "kubernetes.io/cluster/tspencer-ekstest" = "shared"
   }
 }
 resource "aws_subnet" "eks2" {
@@ -39,23 +29,10 @@ resource "aws_subnet" "eks2" {
   availability_zone = "us-east-2c"
 
   tags = {
-    Name = "tspencer-eks2"
-    createdby = "tspencer"
-    "kubernetes.io/cluster/ekstest" = "shared"
+    Name = "tspencer-eks2",
+    "kubernetes.io/cluster/tspencer-ekstest" = "shared"
   }
 }
-
-# resource "aws_db_instance" "idp" {
-#   allocated_storage    = 5
-#   storage_type         = "standard"
-#   engine               = "postgres"
-#   engine_version       = "9.6.16"
-#   instance_class       = "db.t3.small"
-#   name                 = "idpdb"
-#   username             = var.dbusername
-#   password             = var.dbpw
-#   db_subnet_group_name = aws_subnet.db.id
-# }
 
 output "vpc" {
   value = aws_vpc.eksvpc.id
@@ -78,13 +55,9 @@ resource "aws_eks_cluster" "ekstest" {
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
   # Otherwise, EKS will not be able to properly delete EKS managed EC2 infrastructure such as Security Groups.
   depends_on = [
-    aws_iam_role_policy_attachment.ekstest-AmazonEKSClusterPolicy,
-    aws_iam_role_policy_attachment.ekstest-AmazonEKSServicePolicy,
+    aws_iam_role_policy_attachment.tspencer-AmazonEKSClusterPolicy,
+    aws_iam_role_policy_attachment.tspencer-AmazonEKSServicePolicy,
   ]
-
-  tags = {
-    createdby = "tspencer"
-  }
 }
 
 
@@ -107,12 +80,12 @@ resource "aws_iam_role" "eksrole" {
 POLICY
 }
 
-resource "aws_iam_role_policy_attachment" "ekstest-AmazonEKSClusterPolicy" {
+resource "aws_iam_role_policy_attachment" "tspencer-AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.eksrole.name
 }
 
-resource "aws_iam_role_policy_attachment" "ekstest-AmazonEKSServicePolicy" {
+resource "aws_iam_role_policy_attachment" "tspencer-AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
   role       = aws_iam_role.eksrole.name
 }
@@ -146,10 +119,6 @@ data "aws_iam_policy_document" "ekstest_assume_role_policy" {
 resource "aws_iam_role" "ekstest" {
   assume_role_policy = data.aws_iam_policy_document.ekstest_assume_role_policy.json
   name               = "tspencer-ekstest"
-
-  tags = {
-    createdby = "tspencer"
-  }
 }
 output "endpoint" {
   value = aws_eks_cluster.ekstest.endpoint
@@ -159,45 +128,55 @@ output "kubeconfig-certificate-authority-data" {
   value = aws_eks_cluster.ekstest.certificate_authority.0.data
 }
 
+###################################################
+# EKS node group
+resource "aws_eks_node_group" "ekstest" {
+  cluster_name    = aws_eks_cluster.ekstest.name
+  node_group_name = "tspencer-ekstest"
+  node_role_arn   = aws_iam_role.ekstestnode.arn
+  subnet_ids = [aws_subnet.eks1.id, aws_subnet.eks2.id]
 
-##################################################
-# eks fargate profile
-##################################################
-resource "aws_eks_fargate_profile" "eks" {
-  cluster_name           = aws_eks_cluster.ekstest.name
-  fargate_profile_name   = "tspencer-fargatetest"
-  pod_execution_role_arn = aws_iam_role.eksfargaterole.arn
-  subnet_ids             = [aws_subnet.eks1.id, aws_subnet.eks2.id]
-
-  selector {
-    namespace = "kube-system"
+  scaling_config {
+    desired_size = 1
+    max_size     = 2
+    min_size     = 1
   }
 
-  tags = {
-    createdby = "tspencer"
-  }
+  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
+  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
+  depends_on = [
+    aws_iam_role_policy_attachment.tspencer-AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.tspencer-AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.tspencer-AmazonEC2ContainerRegistryReadOnly,
+  ]
 }
 
-resource "aws_iam_role" "eksfargaterole" {
-  name = "tspencer-eks-fargate-profile-test"
+resource "aws_iam_role" "ekstestnode" {
+  name = "tspencer-eks-node-group-ekstest"
 
   assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
       Principal = {
-        Service = "eks-fargate-pods.amazonaws.com"
+        Service = "ec2.amazonaws.com"
       }
     }]
     Version = "2012-10-17"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ekstest-AmazonEKSFargatePodExecutionRolePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
-  role       = aws_iam_role.eksfargaterole.name
+resource "aws_iam_role_policy_attachment" "tspencer-AmazonEKSWorkerNodePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.ekstestnode.name
 }
 
-# output "idpdb" {
-#   value = aws_db_instance.idp.endpoint
-# }
+resource "aws_iam_role_policy_attachment" "tspencer-AmazonEKS_CNI_Policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.ekstestnode.name
+}
+
+resource "aws_iam_role_policy_attachment" "tspencer-AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.ekstestnode.name
+}
