@@ -46,7 +46,7 @@ users:
       args:
         - "token"
         - "-i"
-        - "${var.cluster-name}"
+        - "${var.cluster_name}"
 KUBECONFIG
 }
 
@@ -56,4 +56,12 @@ output "config_map_aws_auth" {
 
 output "kubeconfig" {
   value = local.kubeconfig
+}
+
+output "statebucketinfo" {
+  value = aws_s3_bucket.tf-state.arn
+}
+
+output "statedynamoinfo" {
+  value = aws_dynamodb_table.tf-lock-table.arn
 }

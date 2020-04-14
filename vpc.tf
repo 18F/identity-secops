@@ -11,7 +11,7 @@ resource "aws_vpc" "secops" {
 
   tags = map(
     "Name", "terraform-eks-secops-node",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
+    "kubernetes.io/cluster/${var.cluster_name}", "shared",
   )
 }
 
@@ -24,7 +24,7 @@ resource "aws_subnet" "secops" {
 
   tags = map(
     "Name", "terraform-eks-secops-node",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
+    "kubernetes.io/cluster/${var.cluster_name}", "shared",
   )
 }
 
