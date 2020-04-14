@@ -35,13 +35,19 @@ to start automation to support IR and assessment work
 
 ## process
 
-* `terraform apply`
+eksctl version:
+* `eksctl create cluster`
+* `eksctl create nodegroup --cluster scrumptious-wardrobe-1586800393`
+
+Pros/Cons:  Super simple, but no drift detection or repeatability really
+
+terraform version:
 * `brew install kubectl`
 * `brew install aws-iam-authenticator`
-* `aws eks --region us-east-2 update-kubeconfig --name ekstest`
-* `kubectl patch deployment coredns -n kube-system --type json \
--p='[{"op": "remove", "path": "/spec/template/metadata/annotations/eks.amazonaws.com~1compute-type"}]'`
-* `kubectl rollout restart -n kube-system deployment coredns`
+* `terraform apply`
+* `aws eks --region us-east-2 update-kubeconfig --name terraform-eks-secops --region us-west-2`
+* `terraform output config_map_aws_auth > configmap.yml`
+* `kubectl apply -f configmap.yml`
 
 ## Notes
 k8s stuff:
