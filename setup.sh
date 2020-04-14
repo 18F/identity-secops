@@ -73,7 +73,8 @@ terraform import aws_dynamodb_table.tf-lock-table secops_terraform_locks
 terraform apply
 
 # This updates the kubeconfig so that the nodes can talk with the masters
-aws eks --region "$REGION" update-kubeconfig --name terraform-eks-secops --region "$REGION"
-terraform output config_map_aws_auth > /tmp/$$.configmap.yml
-kubectl apply -f /tmp/$$.configmap.yml
-rm -f /tmp/$$.configmap.yml
+aws eks --region "$REGION" update-kubeconfig --name "$TF_VAR_cluster_name" --region "$REGION"
+rm -f /tmp/configmap.yml
+terraform output config_map_aws_auth > /tmp/configmap.yml
+kubectl apply -f /tmp/configmap.yml
+rm -f /tmp/configmap.yml
