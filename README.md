@@ -16,13 +16,14 @@ to start automation to support IR and assessment work
 
 ## Plan
 * Get EKS going with terraform (like EKS because you can run k8s locally too)
-	* terraform shared state should be set up
+	* Xterraform shared state should be set up
 	* have logging going to... ELK?  CW?
-	* secrets/config persist somewhere (vault?  AWS Secrets manager?)
-	* build requirements persist somewhere (s3?)  Should discuss.
+	* Xsecrets/config persist somewhere (vault?  AWS Secrets manager?)
+	* Xbuild requirements persist somewhere (s3?)
+	* persistent volumes should be EBS
 * get CI/CD going to deploy a helm chart.  Maybe ES?  Use codebuild?
 	* CircleCI?  Codebuild?  Spinnaker?  Concourse:  start with Codebuild
-	* put stuff into ECR
+	* Xput stuff into ECR
 * Make sure that security is baked in
 	* IAM roles for access?
 	* Istio?
@@ -34,6 +35,10 @@ to start automation to support IR and assessment work
 	* Solution:  Try doing with regular node groups, sigh.
 * eksctl is great, but doesn't provide fine-grained control over environment
 	* Solution:  Use terraform
+* nessus needs to use a persistent volume
+	* first try:  tarball /opt/nessus and unpack if empty
+* nessus needs to upgrade it's code, but pv doesn't do that
+	* bundle nessus deb into container and install every time we run?  Seems terrible.
 
 ## process
 
