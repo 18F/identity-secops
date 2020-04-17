@@ -94,3 +94,41 @@ resource "aws_iam_role_policy" "codebuild" {
 }
 POLICY
 }
+
+resource "aws_iam_role" "k8sdeploy" {
+  name = "k8sdeploy"
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "eks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+}
+
+# resource "aws_iam_role_policy" "k8sdeploy" {
+#   role = aws_iam_role.k8sdeploy.name
+
+#   policy = <<POLICY
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": [
+#         "eks:XXX"
+#       ],
+#       "Resource": "*",
+#       "Effect": "Allow"
+#     }
+#   ]
+# }
+# POLICY
+# }

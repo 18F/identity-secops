@@ -28,6 +28,7 @@ to start automation to support IR and assessment work
 	* IAM roles for access?
 	* Istio?
 	* Twistlock/Aqua/TenableCS?
+* Figure out system for running k8s on local system too?
 * super-stretch goal:  make helm chart for identity-idp and see if it works!
 
 ## Problems encountered so far

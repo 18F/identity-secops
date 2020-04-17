@@ -48,6 +48,10 @@ resource "aws_codebuild_project" "nessus" {
       name  = "IMAGE_TAG"
       value = "latest"
     }
+    environment_variable {
+      name  = "CLUSTER"
+      value = aws_eks_cluster.secops.name
+    }
   }
 
   source {
@@ -67,3 +71,57 @@ resource "aws_codebuild_project" "nessus" {
     Environment = "Test"
   }
 }
+
+
+# # here is the codepipeline that builds/deploys it
+# resource "aws_codepipeline" "nessus" {
+#   name     = "nessus"
+#   role_arn = aws_iam_role.codepipeline_role.arn
+
+#   artifact_store {
+#     location = aws_s3_bucket.codepipeline_bucket.bucket
+#     type     = "S3"
+
+#     encryption_key {
+#       id   = aws_kms_alias.pipelines3kmskey.arn
+#       type = "KMS"
+#     }
+#   }
+
+#   stage {
+#     name = "Source"
+
+#     action {
+#       name             = "Source"
+#       category         = "Source"
+#       owner            = "ThirdParty"
+#       provider         = "GitHub"
+#       version          = "1"
+#       output_artifacts = ["source_output"]
+
+#       configuration = {
+#         Owner  = "18F"
+#         Repo   = "identity-secops-nessus"
+#         Branch = "master"
+#       }
+#     }
+#   }
+
+#   stage {
+#     name = "BuildTestDeploy"
+
+#     action {
+#       name             = "NessusBuildTestDeploy"
+#       category         = "Build"
+#       owner            = "AWS"
+#       provider         = "CodeBuild"
+#       input_artifacts  = ["source_output"]
+#       output_artifacts = ["build_output"]
+#       version          = "1"
+
+#       configuration = {
+#         ProjectName = "nessus"
+#       }
+#     }
+#   }
+# }

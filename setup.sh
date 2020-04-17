@@ -17,6 +17,8 @@ fi
 ACCOUNT=$(aws sts get-caller-identity | jq -r .Account)
 REGION="us-west-2"
 BUCKET="login-dot-gov-secops.${ACCOUNT}-${REGION}"
+SCRIPT_BASE=$(dirname "$0")
+RUN_BASE=$(pwd)
 
 checkbinary() {
      if which terraform >/dev/null ; then
@@ -60,6 +62,7 @@ else
 fi
 
 # set it up with the s3 backend
+cd "$RUN_BASE/$SCRIPT_BASE/secops-all"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
@@ -70,11 +73,4 @@ terraform import aws_s3_bucket.tf-state "$BUCKET"
 terraform import aws_dynamodb_table.tf-lock-table secops_terraform_locks
 
 # Here we go!  This is where the magic happens.  :-)
-terraform apply
-
-# This updates the kubeconfig so that the nodes can talk with the masters
-aws eks --region "$REGION" update-kubeconfig --name "$TF_VAR_cluster_name" --region "$REGION"
-rm -f /tmp/configmap.yml
-terraform output config_map_aws_auth > /tmp/configmap.yml
-kubectl apply -f /tmp/configmap.yml
-rm -f /tmp/configmap.yml
+"$SCRIPT_BASE/deploy.sh" "$1"

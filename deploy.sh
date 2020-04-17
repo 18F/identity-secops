@@ -38,13 +38,32 @@ done
 ACCOUNT=$(aws sts get-caller-identity | jq -r .Account)
 REGION="us-west-2"
 BUCKET="login-dot-gov-secops.${ACCOUNT}-${REGION}"
+SCRIPT_BASE=$(dirname "$0")
+RUN_BASE=$(pwd)
+
 
 # set it up with the s3 backend
+cd "$SCRIPT_BASE/secops-all"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
       -backend-config="region=$REGION"
-
-# Here we go!  This is where the magic happens.  :-)
 terraform apply
 
+# This updates the kubeconfig so that the nodes can talk with the masters
+# and also maps IAM roles to users.
+rm -f /tmp/configmap.yml
+terraform output config_map_aws_auth > /tmp/configmap.yml
+kubectl apply -f /tmp/configmap.yml
+rm -f /tmp/configmap.yml
+
+# this turns on the EBS persistent volume stuff
+# XXX do we want to set this up with helm instead?  
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+
+cd "$RUN_BASE/$SCRIPT_BASE/secops-k8s"
+terraform init -backend-config="bucket=$BUCKET" \
+      -backend-config="key=tf-state/${TF_VAR_cluster_name}_k8s" \
+      -backend-config="dynamodb_table=secops_terraform_locks" \
+      -backend-config="region=$REGION"
+terraform apply

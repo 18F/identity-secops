@@ -18,6 +18,8 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+    - rolearn: ${aws_iam_role.codebuild.arn}
+      username: deploy
 CONFIGMAPAWSAUTH
 
   kubeconfig = <<KUBECONFIG
