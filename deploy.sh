@@ -15,10 +15,10 @@ else
 fi
 
 checkbinary() {
-     if which terraform >/dev/null ; then
+     if which "$1" >/dev/null ; then
           return 0
      else
-          echo no terraform found: exiting
+          echo no "$1" found: exiting
           exit 1
      fi
 }
@@ -41,6 +41,11 @@ BUCKET="login-dot-gov-secops.${ACCOUNT}-${REGION}"
 SCRIPT_BASE=$(dirname "$0")
 RUN_BASE=$(pwd)
 
+
+if [ -z "$GITHUB_TOKEN" ] ; then
+  echo "GITHUB_TOKEN needs to be set so that the deploy webhooks can be set up"
+  exit 1
+fi
 
 # set it up with the s3 backend
 cd "$SCRIPT_BASE/secops-all"

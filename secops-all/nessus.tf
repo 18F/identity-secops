@@ -73,55 +73,75 @@ resource "aws_codebuild_project" "nessus" {
 }
 
 
-# # here is the codepipeline that builds/deploys it
-# resource "aws_codepipeline" "nessus" {
-#   name     = "nessus"
-#   role_arn = aws_iam_role.codepipeline_role.arn
+# here is the codepipeline that builds/deploys it
+resource "aws_codepipeline" "nessus" {
+  name     = "nessus"
+  role_arn = aws_iam_role.codepipeline_role.arn
 
-#   artifact_store {
-#     location = aws_s3_bucket.codepipeline_bucket.bucket
-#     type     = "S3"
+  artifact_store {
+    location = aws_s3_bucket.codepipeline_bucket.bucket
+    type     = "S3"
 
-#     encryption_key {
-#       id   = aws_kms_alias.pipelines3kmskey.arn
-#       type = "KMS"
-#     }
-#   }
+    encryption_key {
+      id   = aws_kms_alias.pipelines3kmskey.arn
+      type = "KMS"
+    }
+  }
 
-#   stage {
-#     name = "Source"
+  stage {
+    name = "Source"
 
-#     action {
-#       name             = "Source"
-#       category         = "Source"
-#       owner            = "ThirdParty"
-#       provider         = "GitHub"
-#       version          = "1"
-#       output_artifacts = ["source_output"]
+    action {
+      name             = "Source"
+      category         = "Source"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
+      version          = "1"
+      output_artifacts = ["source_output"]
 
-#       configuration = {
-#         Owner  = "18F"
-#         Repo   = "identity-secops-nessus"
-#         Branch = "master"
-#       }
-#     }
-#   }
+      configuration = {
+        Owner  = "18F"
+        Repo   = "identity-secops-nessus"
+        Branch = "master"
+      }
+    }
+  }
 
-#   stage {
-#     name = "BuildTestDeploy"
+  stage {
+    name = "BuildTestDeploy"
 
-#     action {
-#       name             = "NessusBuildTestDeploy"
-#       category         = "Build"
-#       owner            = "AWS"
-#       provider         = "CodeBuild"
-#       input_artifacts  = ["source_output"]
-#       output_artifacts = ["build_output"]
-#       version          = "1"
+    action {
+      name             = "NessusBuildTestDeploy"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      input_artifacts  = ["source_output"]
+      output_artifacts = ["build_output"]
+      version          = "1"
 
-#       configuration = {
-#         ProjectName = "nessus"
-#       }
-#     }
-#   }
-# }
+      configuration = {
+        ProjectName = "nessus"
+      }
+    }
+  }
+}
+
+# need this so that we can get the license key for nessus
+resource "aws_iam_role_policy" "nessus" {
+  role = aws_iam_role.codebuild.name
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:*:*:secret:nessus-license-*",
+      "Effect": "Allow"
+    }
+  ]
+}
+POLICY
+}

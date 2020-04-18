@@ -21,10 +21,10 @@ SCRIPT_BASE=$(dirname "$0")
 RUN_BASE=$(pwd)
 
 checkbinary() {
-     if which terraform >/dev/null ; then
+     if which "$1" >/dev/null ; then
           return 0
      else
-          echo no terraform found: exiting
+          echo no "$1" found: exiting
           exit 1
      fi
 }

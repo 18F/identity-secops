@@ -40,6 +40,7 @@ to start automation to support IR and assessment work
 	* first try:  tarball /opt/nessus and unpack if empty
 * nessus needs to upgrade it's code, but pv doesn't do that
 	* bundle nessus deb into container and install every time we run?  Seems terrible.
+	* nessus automatically upgrades itself, so nevermind
 
 ## process
 
