@@ -52,7 +52,8 @@ cd "$SCRIPT_BASE/secops-all"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
-      -backend-config="region=$REGION"
+      -backend-config="region=$REGION" \
+      -upgrade
 terraform apply
 
 # This updates the kubeconfig so that the nodes can talk with the masters
@@ -70,5 +71,6 @@ cd "$RUN_BASE/$SCRIPT_BASE/secops-k8s"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/${TF_VAR_cluster_name}_k8s" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
-      -backend-config="region=$REGION"
+      -backend-config="region=$REGION" \
+      -upgrade
 terraform apply
