@@ -3,13 +3,6 @@ resource "aws_s3_bucket" "codepipeline_bucket" {
   acl    = "private"
 }
 
-resource "aws_kms_key" "pipeline" {}
-
-resource "aws_kms_alias" "pipelines3kmskey" {
-  name = "alias/pipelineKmsKey"
-  target_key_id = aws_kms_key.pipeline.key_id
-}
-
 resource "aws_iam_role" "codepipeline_role" {
   name = "test-role"
 

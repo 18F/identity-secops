@@ -10,6 +10,5 @@ module "nessus" {
   eks_cluster_name = aws_eks_cluster.secops.name
   codepipeline_arn = aws_iam_role.codepipeline_role.arn
   codepipeline_bucket = aws_s3_bucket.codepipeline_bucket.bucket
-  codepipeline_kmskey_arn = aws_kms_alias.pipelines3kmskey.arn
 }
 

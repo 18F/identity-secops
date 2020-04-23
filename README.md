@@ -20,10 +20,11 @@ to start automation to support IR and assessment work
 	* have logging going to... ELK?  CW?
 	* Xsecrets/config persist somewhere (vault?  AWS Secrets manager?)
 	* Xbuild requirements persist somewhere (s3?)
-	* persistent volumes should be EBS
+	* Xpersistent volumes should be EBS
 * get CI/CD going to deploy a helm chart.  Maybe ES?  Use codebuild?
-	* CircleCI?  Codebuild?  Spinnaker?  Concourse:  start with Codebuild
+	* XCircleCI?  Codebuild?  Spinnaker?  Concourse:  start with Codebuild
 	* Xput stuff into ECR
+	* get codepipeline to kick off builds
 * Make sure that security is baked in
 	* IAM roles for access?
 	* Istio?
@@ -46,6 +47,8 @@ to start automation to support IR and assessment work
 
 * `brew install kubectl`
 * `brew install aws-iam-authenticator`
+* make sure that your environment is set up to point at the AWS account that you want
+  the cluster to live with `AWS_PROFILE` or AWS Vault.
 * First time: `./setup.sh <clustername>` where `clustername` is something like `secops-dev`
 * Deploys to already existing cluster:  `./deploy.sh <clustername>`
 
