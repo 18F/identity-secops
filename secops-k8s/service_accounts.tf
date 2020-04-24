@@ -19,6 +19,11 @@ resource "kubernetes_role" "deploy" {
     resources      = ["secrets"]
     verbs          = ["list", "create", "update"]
   }
+  rule {
+    api_groups     = ["extensions"]
+    resources      = ["deployments"]
+    verbs          = ["get", "patch"]
+  }
 }
 
 resource "kubernetes_role_binding" "deploy" {
