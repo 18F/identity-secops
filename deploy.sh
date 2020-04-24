@@ -71,7 +71,7 @@ rm -f /tmp/configmap.yml
 # XXX do we want to set this up with helm instead?
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
-cd "$RUN_BASE/$SCRIPT_BASE/secops-k8s"
+cd "$RUN_BASE/secops-k8s"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/${TF_VAR_cluster_name}_k8s" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
