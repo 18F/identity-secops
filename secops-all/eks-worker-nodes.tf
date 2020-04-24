@@ -5,13 +5,13 @@
 #
 resource "aws_eks_node_group" "secops" {
   cluster_name    = aws_eks_cluster.secops.name
-  node_group_name = "secops"
+  node_group_name = "secops-${var.cluster_name}"
   node_role_arn   = aws_iam_role.secops-node.arn
   subnet_ids      = aws_subnet.secops[*].id
 
   scaling_config {
     desired_size = 1
-    max_size     = 1
+    max_size     = 3
     min_size     = 1
   }
 
@@ -24,7 +24,7 @@ resource "aws_eks_node_group" "secops" {
 
 
 resource "aws_iam_role" "secops-node" {
-  name = "terraform-eks-secops-node"
+  name = "${var.cluster_name}-noderole"
 
   assume_role_policy = <<POLICY
 {

@@ -47,6 +47,9 @@ if [ -z "$GITHUB_TOKEN" ] ; then
   exit 1
 fi
 
+# clean up tfstate files so that we get them from the backend
+find . -name terraform.tfstate -print0 | xargs -0 rm
+
 # set it up with the s3 backend
 cd "$SCRIPT_BASE/secops-all"
 terraform init -backend-config="bucket=$BUCKET" \
@@ -58,13 +61,14 @@ terraform apply
 
 # This updates the kubeconfig so that the nodes can talk with the masters
 # and also maps IAM roles to users.
+aws eks update-kubeconfig --name "$TF_VAR_cluster_name"
 rm -f /tmp/configmap.yml
 terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
 # this turns on the EBS persistent volume stuff
-# XXX do we want to set this up with helm instead?  
+# XXX do we want to set this up with helm instead?
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
 cd "$RUN_BASE/$SCRIPT_BASE/secops-k8s"

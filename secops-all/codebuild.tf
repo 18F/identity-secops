@@ -33,7 +33,7 @@ resource "aws_s3_bucket_public_access_block" "artifacts" {
 
 
 resource "aws_iam_role" "codebuild" {
-  name = "codebuild"
+  name = "codebuild-${var.cluster_name}"
 
   assume_role_policy = <<EOF
 {

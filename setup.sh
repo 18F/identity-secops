@@ -73,4 +73,4 @@ terraform import aws_s3_bucket.tf-state "$BUCKET"
 terraform import aws_dynamodb_table.tf-lock-table secops_terraform_locks
 
 # Here we go!  This is where the magic happens.  :-)
-"$SCRIPT_BASE/deploy.sh" "$1"
+"$RUN_BASE/$SCRIPT_BASE/deploy.sh" "$1"

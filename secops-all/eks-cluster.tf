@@ -24,7 +24,7 @@ resource "aws_eks_cluster" "secops" {
 }
 
 resource "aws_iam_role" "secops-cluster" {
-  name = "terraform-eks-secops-cluster"
+  name = "${var.cluster_name}-role"
 
   assume_role_policy = <<POLICY
 {
