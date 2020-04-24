@@ -50,10 +50,14 @@ terraform init -backend-config="bucket=$BUCKET" \
       -upgrade
 terraform destroy
 
-cd "$SCRIPT_BASE/secops-all"
+cd "$RUN_BASE/$SCRIPT_BASE/secops-all"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
       -backend-config="region=$REGION" \
       -upgrade
+
+# forget about the state bucket
+terraform state rm aws_s3_bucket.tf-state
+terraform state rm aws_dynamodb_table.tf-lock-table
 terraform destroy
