@@ -8,9 +8,10 @@ resource "aws_eks_node_group" "secops" {
   node_group_name = "secops-${var.cluster_name}"
   node_role_arn   = aws_iam_role.secops-node.arn
   subnet_ids      = aws_subnet.secops[*].id
+  instance_types  = ["t3a.large"]
 
   scaling_config {
-    desired_size = 1
+    desired_size = 2
     max_size     = 3
     min_size     = 1
   }

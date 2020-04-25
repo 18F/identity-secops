@@ -10,7 +10,7 @@ resource "aws_vpc" "secops" {
   cidr_block = "10.0.0.0/16"
 
   tags = map(
-    "Name", "terraform-eks-secops-node",
+    "Name", "${var.cluster_name}-vpc",
     "kubernetes.io/cluster/${var.cluster_name}", "shared",
   )
 }
@@ -24,7 +24,7 @@ resource "aws_subnet" "secops" {
   map_public_ip_on_launch = true
 
   tags = map(
-    "Name", "terraform-eks-secops-node",
+    "Name", "${var.cluster_name}-node",
     "kubernetes.io/cluster/${var.cluster_name}", "shared",
   )
 }
@@ -33,7 +33,7 @@ resource "aws_internet_gateway" "secops" {
   vpc_id = aws_vpc.secops.id
 
   tags = {
-    Name = "terraform-eks-secops"
+    Name = var.cluster_name
   }
 }
 
