@@ -18,3 +18,17 @@ resource "helm_release" "kibana" {
   chart      = "kibana"
 }
 
+resource "helm_release" "logstash" {
+  name       = "logstash"
+  namespace  = "kube-system"
+  repository = data.helm_repository.elastic.metadata[0].url
+  values = ["${file("logstash-values.yaml")}"]
+  chart      = "logstash"
+}
+
+resource "helm_release" "filebeat" {
+  name       = "filebeat"
+  namespace  = "kube-system"
+  repository = data.helm_repository.elastic.metadata[0].url
+  chart      = "filebeat"
+}
