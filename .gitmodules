@@ -1,0 +1,3 @@
+[submodule "spinnaker-operator"]
+	path = spinnaker-operator
+	url = https://github.com/armory-io/spinnaker-operator
