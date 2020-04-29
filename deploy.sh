@@ -68,7 +68,7 @@ kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
 # this turns on the EBS persistent volume stuff
-# XXX do we want to set this up with helm instead?
+# XXX do we want to set this up with helm instead or tie it to a release/version?
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
 cd "$RUN_BASE/secops-k8s"
@@ -78,3 +78,6 @@ terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="region=$REGION" \
       -upgrade
 terraform apply
+
+# install all of the infrastructure k8s stuff
+kubectl apply -f "$SCRIPT_BASE/secops-k8s/k8s/*.yaml"

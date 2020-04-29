@@ -16,21 +16,25 @@ to start automation to support IR and assessment work
 
 ## Plan
 * Get EKS going with terraform (like EKS because you can run k8s locally too)
-	* Xterraform shared state should be set up
-	* have logging going to... ELK?  CW?
-	* Xsecrets/config persist somewhere (vault?  AWS Secrets manager?)
-	* Xbuild requirements persist somewhere (s3?)
-	* Xpersistent volumes should be EBS
+	* ~~terraform shared state should be set up~~
+	* ~~have logging going to... ELK?~~
+	* ~~secrets/config persist somewhere (vault?  AWS Secrets manager?)~~
+	* ~~build requirements persist somewhere (s3?)~~
+	* ~~persistent volumes should be EBS~~
 * get CI/CD going to deploy a helm chart.  Maybe ES?  Use codebuild?
-	* XCircleCI?  Codebuild?  Spinnaker?  Concourse:  start with Codebuild
-	* Xput stuff into ECR
-	* get codepipeline to kick off builds
+	* ~~CircleCI?  Codebuild?  Spinnaker?  Concourse:  start with Codebuild~~
+	* ~~put stuff into ECR~~
+	* ~~get codepipeline to kick off builds~~
+	* retooling to do builds with circleci into docker hub, will be relying on spinnaker work being done by Mike
 * Make sure that security is baked in
 	* IAM roles for access?
 	* Istio?
 	* Twistlock/Aqua/TenableCS?
+	* ~~clamav~~
+	* falco
 * Figure out system for running k8s on local system too?
 * super-stretch goal:  make helm chart for identity-idp and see if it works!
+	* Mike and others are doing this
 
 ## Problems encountered so far
 * EKS/Fargate only works in us-east-* regions, we are in us-west-2.
@@ -42,6 +46,9 @@ to start automation to support IR and assessment work
 * nessus needs to upgrade it's code, but pv doesn't do that
 	* bundle nessus deb into container and install every time we run?  Seems terrible.
 	* nessus automatically upgrades itself, so nevermind
+* clamav scan was terrible, not finding stuff in /tmp
+	* retooled to scan everything, but this takes a long time
+	* probably going to rejigger to do a scan on deploy, then inotify for changes
 
 ## process
 
