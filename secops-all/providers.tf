@@ -42,7 +42,7 @@ resource "aws_s3_bucket" "tf-state" {
   }
 
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = true
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_dynamodb_table" "tf-lock-table" {
   }
 
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = true
   }
 }
 

@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "spinnaker" {
   acl    = "private"
 
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = true
   }
 }
 

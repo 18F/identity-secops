@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "artifacts" {
   }
 
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = true
   }
 }
 

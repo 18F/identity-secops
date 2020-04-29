@@ -1,14 +1,9 @@
-# a reference to the imported base zone.
-resource "aws_route53_zone" "identity-sandbox" {
-  name = "identitysandbox.gov"
-}
-
 # base v2 infrastructure zone, mostly used to prevent collisions.
 resource "aws_route53_zone" "v2" {
   name = "v2.identitysandbox.gov"
 
   lifecycle {
-      prevent_destroy = var.prevent_destroy
+      prevent_destroy = true
   }
 }
 
@@ -32,7 +27,7 @@ resource "aws_route53_zone" "nested" {
   name = "${var.cluster_name}.v2.identitysandbox.gov"
 
   lifecycle {
-      prevent_destroy = var.prevent_destroy
+      prevent_destroy = true
   }
 }
 

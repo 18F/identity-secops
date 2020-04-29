@@ -4,7 +4,7 @@ resource "aws_acm_certificate" "ci" {
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = true
   }
 
   options {
@@ -23,7 +23,7 @@ resource "aws_acm_certificate" "gate" {
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = true
   }
 
   options {
