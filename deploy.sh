@@ -67,17 +67,16 @@ terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
+# apply global k8s config
+kubectl apply -f "$RUN_BASE/secops-k8s/"
+
 # this turns on the EBS persistent volume stuff
-# XXX do we want to set this up with helm instead or tie it to a release/version?
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 
-cd "$RUN_BASE/secops-k8s"
-terraform init -backend-config="bucket=$BUCKET" \
-      -backend-config="key=tf-state/${TF_VAR_cluster_name}_k8s" \
-      -backend-config="dynamodb_table=secops_terraform_locks" \
-      -backend-config="region=$REGION" \
-      -upgrade
-terraform apply
-
-# install all of the infrastructure k8s stuff
-kubectl apply -f "$SCRIPT_BASE/secops-k8s/k8s/*.yaml"
+# install all of the infrastructure k8s stuff in namespaces
+NAMESPACES="$(ls "$RUN_BASE"/secops-k8s/namespaces)"
+for i in $NAMESPACES ; do
+  echo "applying stuff in namespace $i"
+  kubectl apply -f "$RUN_BASE/secops-k8s/namespaces/$i" --namespace "$i"
+done
