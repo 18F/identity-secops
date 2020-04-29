@@ -1,10 +1,10 @@
-resource "random_pet" "s3" {
-  length = 1
-}
-
 resource "aws_s3_bucket" "spinnaker" {
-  bucket = "spinnaker-config-${random_pet.s3.id}"
+  bucket = "spinnaker-config-${random_pet.rand.id}"
   acl    = "private"
+
+  lifecycle {
+    prevent_destroy = var.prevent_destroy
+  }
 }
 
 resource "aws_iam_role" "spinnaker-s3" {

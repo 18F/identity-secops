@@ -12,6 +12,11 @@ terraform {
   }
 }
 
+# provide some randomness so clusters can be created and destroyed easily.
+resource "random_pet" "rand" {
+  length = 1
+}
+
 # Using these data sources allows the configuration to be
 # generic for any region.
 data "aws_region" "current" {}
@@ -37,7 +42,7 @@ resource "aws_s3_bucket" "tf-state" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 
@@ -68,7 +73,7 @@ resource "aws_dynamodb_table" "tf-lock-table" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 

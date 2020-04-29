@@ -11,6 +11,11 @@ variable "region" {
   type    = string
 }
 
+variable "prevent_destroy" {
+  default = true
+  type = bool
+}
+
 # networks which are allowed to talk with the k8s API
 variable "kubecontrolnets" {
   default = ["98.146.223.15/32", "159.142.0.0/16"]
