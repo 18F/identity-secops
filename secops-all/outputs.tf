@@ -59,3 +59,7 @@ output "config_map_aws_auth" {
 output "kubeconfig" {
   value = local.kubeconfig
 }
+
+output "spinnaker-s3-bucket" {
+  value = aws_s3_bucket.spinnaker.bucket
+}

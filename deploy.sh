@@ -50,8 +50,9 @@ fi
 # clean up tfstate files so that we get them from the backend
 find . -name terraform.tfstate -print0 | xargs -0 rm
 
-# set it up with the s3 backend
-cd "$SCRIPT_BASE/secops-all"
+# set it up with the s3 backend, push into the directory.
+pushd "$SCRIPT_BASE/secops-all"
+
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
@@ -67,17 +68,13 @@ terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
+# done with tf, pop out.
+popd
+
 # this turns on the EBS persistent volume stuff
 # XXX do we want to set this up with helm instead or tie it to a release/version?
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
-cd "$RUN_BASE/secops-k8s"
-terraform init -backend-config="bucket=$BUCKET" \
-      -backend-config="key=tf-state/${TF_VAR_cluster_name}_k8s" \
-      -backend-config="dynamodb_table=secops_terraform_locks" \
-      -backend-config="region=$REGION" \
-      -upgrade
-terraform apply
-
 # install all of the infrastructure k8s stuff
-kubectl apply -f "$SCRIPT_BASE/secops-k8s/k8s/*.yaml"
+kubectl apply -R -f "$SCRIPT_BASE/common-k8s"
+kubectl apply -f "$SCRIPT_BASE/secops-k8s"

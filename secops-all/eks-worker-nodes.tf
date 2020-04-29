@@ -11,18 +11,18 @@ resource "aws_eks_node_group" "secops" {
   instance_types  = ["t3a.large"]
 
   scaling_config {
-    desired_size = 2
-    max_size     = 3
-    min_size     = 1
+    desired_size = 3
+    max_size     = 5
+    min_size     = 2
   }
 
   depends_on = [
     aws_iam_role_policy_attachment.secops-node-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.secops-node-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.secops-node-AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.secops-node-spinnaker-s3
   ]
 }
-
 
 resource "aws_iam_role" "secops-node" {
   name = "${var.cluster_name}-noderole"
