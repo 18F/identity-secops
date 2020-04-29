@@ -39,6 +39,7 @@ to start automation to support IR and assessment work
 ## Problems encountered so far
 * EKS/Fargate only works in us-east-* regions, we are in us-west-2.
 	* Solution:  Try doing with regular node groups, sigh.
+	* Thoughts (@mxplusb): Fargate doesn't give us enough control, methinks.
 * eksctl is great, but doesn't provide fine-grained control over environment
 	* Solution:  Use terraform
 * nessus needs to use a persistent volume

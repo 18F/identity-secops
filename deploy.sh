@@ -50,8 +50,9 @@ fi
 # clean up tfstate files so that we get them from the backend
 find . -name terraform.tfstate -print0 | xargs -0 rm
 
-# set it up with the s3 backend
-cd "$SCRIPT_BASE/secops-all"
+# set it up with the s3 backend, push into the directory.
+pushd "$SCRIPT_BASE/secops-all"
+
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
@@ -80,3 +81,6 @@ for i in $NAMESPACES ; do
   echo "applying stuff in namespace $i"
   kubectl apply -f "$RUN_BASE/secops-k8s/namespaces/$i" --namespace "$i"
 done
+
+# apply more common stuff here
+kubectl apply -R -f "$SCRIPT_BASE/common-k8s"
