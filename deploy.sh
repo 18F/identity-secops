@@ -63,18 +63,28 @@ terraform apply
 # This updates the kubeconfig so that the nodes can talk with the masters
 # and also maps IAM roles to users.
 aws eks update-kubeconfig --name "$TF_VAR_cluster_name"
+
+# update the configmap.
 rm -f /tmp/configmap.yml
 terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
+# prepare spinnaker.
+rm -f /tmp/spinnaker.yml
+terraform output spinnaker-service > /tmp/spinnaker.yml
+
 # done with tf, pop out.
 popd
 
 # this turns on the EBS persistent volume stuff
-# XXX do we want to set this up with helm instead or tie it to a release/version?
+# todo (mxplusb): tie to release version.
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
 # install all of the infrastructure k8s stuff
-kubectl apply -R -f "$SCRIPT_BASE/common-k8s"
+kubectl apply -f "$SCRIPT_BASE/common-k8s"
 kubectl apply -f "$SCRIPT_BASE/secops-k8s"
+
+# install spinnaker
+kubectl apply -f "$SCRIPT_BASE/spinnaker"
+kubectl apply -f /tmp/spinnaker.yml

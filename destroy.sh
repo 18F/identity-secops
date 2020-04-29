@@ -41,16 +41,7 @@ for i in ${REQUIREDBINARIES} ; do
      checkbinary "$i"
 done
 
-
-cd "$RUN_BASE/$SCRIPT_BASE/secops-k8s"
-terraform init -backend-config="bucket=$BUCKET" \
-      -backend-config="key=tf-state/${TF_VAR_cluster_name}_k8s" \
-      -backend-config="dynamodb_table=secops_terraform_locks" \
-      -backend-config="region=$REGION" \
-      -upgrade
-terraform destroy
-
-cd "$RUN_BASE/$SCRIPT_BASE/secops-all"
+pushd "$RUN_BASE/$SCRIPT_BASE/secops-all"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \
@@ -61,3 +52,4 @@ terraform init -backend-config="bucket=$BUCKET" \
 terraform state rm aws_s3_bucket.tf-state
 terraform state rm aws_dynamodb_table.tf-lock-table
 terraform destroy
+popd
