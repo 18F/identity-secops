@@ -70,21 +70,19 @@ terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
-# prepare spinnaker.
-rm -f /tmp/spinnaker.yml
-terraform output spinnaker-service > /tmp/spinnaker.yml
-
-# done with tf, pop out.
-popd
+# apply global k8s config
+kubectl apply -f "$RUN_BASE/secops-k8s/"
 
 # this turns on the EBS persistent volume stuff
-# todo (mxplusb): tie to release version.
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 
-# install all of the infrastructure k8s stuff
-kubectl apply -f "$SCRIPT_BASE/common-k8s"
-kubectl apply -f "$SCRIPT_BASE/secops-k8s"
+# install all of the infrastructure k8s stuff in namespaces
+NAMESPACES="$(ls "$RUN_BASE"/secops-k8s/namespaces)"
+for i in $NAMESPACES ; do
+  echo "applying stuff in namespace $i"
+  kubectl apply -f "$RUN_BASE/secops-k8s/namespaces/$i" --namespace "$i"
+done
 
-# install spinnaker
-kubectl apply -f "$SCRIPT_BASE/spinnaker"
-kubectl apply -f /tmp/spinnaker.yml
+# apply more common stuff here
+kubectl apply -R -f "$SCRIPT_BASE/common-k8s"
