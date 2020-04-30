@@ -83,6 +83,3 @@ for i in $NAMESPACES ; do
   echo "applying stuff in namespace $i"
   kubectl apply -f "$RUN_BASE/secops-k8s/namespaces/$i" --namespace "$i"
 done
-
-# apply more common stuff here
-kubectl apply -R -f "$SCRIPT_BASE/common-k8s"

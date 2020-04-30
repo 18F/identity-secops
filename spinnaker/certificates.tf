@@ -1,10 +1,10 @@
 resource "aws_acm_certificate" "ci" {
-  domain_name       = "ci.${var.cluster_name}.v2.identitysandbox.gov"
+  domain_name       = "ci.${var.cluster_name}.v2.${var.base_domain}"
   validation_method = "DNS"
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   options {
@@ -18,12 +18,12 @@ resource "aws_acm_certificate_validation" "ci" {
 }
 
 resource "aws_acm_certificate" "gate" {
-  domain_name       = "gate.${var.cluster_name}.v2.identitysandbox.gov"
+  domain_name       = "gate.${var.cluster_name}.v2.${var.base_domain}"
   validation_method = "DNS"
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   options {

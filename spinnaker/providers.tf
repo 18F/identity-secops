@@ -20,7 +20,7 @@ data "aws_availability_zones" "available" {}
 
 # secops data bucket where tf state and possibly other stuff is stored
 resource "aws_s3_bucket" "tf-state" {
-  bucket = "login-dot-gov-secops.${data.aws_caller_identity.current.account_id}-${var.region}"
+  bucket = "login-dot-gov-devops.${data.aws_caller_identity.current.account_id}-${var.region}"
   region = var.region
   acl    = "private"
   policy = ""
@@ -53,7 +53,7 @@ resource "aws_s3_bucket_public_access_block" "tf-state" {
 
 # set up tfstate lock table
 resource "aws_dynamodb_table" "tf-lock-table" {
-  name           = "secops_terraform_locks"
+  name           = "devops_terraform_locks"
   read_capacity  = 2
   write_capacity = 1
   hash_key       = "LockID"
