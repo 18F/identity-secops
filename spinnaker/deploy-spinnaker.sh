@@ -71,7 +71,7 @@ okay_to_fail terraform import aws_route53_zone.dns $HOSTED_ZONE
 terraform apply
 
 # apply base spinnaker
-kubectl apply -f "."
+kubectl apply -f "." --wait
 
 # update deploy spinnaker
 rm -f spinnaker.yml
