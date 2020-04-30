@@ -30,7 +30,7 @@ EOF
 # todo (mxplusb): this needs to be updated and scoped accordingly.
 resource "aws_iam_role_policy" "spinnaker-s3" {
   name = "spinnaker-s3"
-  role = "${aws_iam_role.spinnaker-s3.id}"
+  role = aws_iam_role.spinnaker-s3.id
 
   policy = <<EOF
 {
@@ -50,5 +50,5 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "secops-node-spinnaker-s3" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = "${aws_iam_role.spinnaker-s3.id}"
+  role       = aws_iam_role.spinnaker-s3.id
 }

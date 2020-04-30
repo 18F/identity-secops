@@ -9,7 +9,7 @@ resource "aws_route53_zone" "v2" {
 
 # ns records for nested resolution.
 resource "aws_route53_record" "v2-ns" {
-  zone_id = "${aws_route53_zone.identity-sandbox.zone_id}"
+  zone_id = aws_route53_zone.identity-sandbox.zone_id
   name    = "v2.identitysandbox.gov"
   type    = "NS"
   ttl     = "30"
@@ -33,7 +33,7 @@ resource "aws_route53_zone" "nested" {
 
 # per-env NS records.
 resource "aws_route53_record" "nested-ns" {
-  zone_id = "${aws_route53_zone.identity-sandbox.zone_id}"
+  zone_id = aws_route53_zone.identity-sandbox.zone_id
   name    = "${var.cluster_name}.v2.identitysandbox.gov"
   type    = "NS"
   ttl     = "30"
@@ -48,18 +48,19 @@ resource "aws_route53_record" "nested-ns" {
 
 # spinnaker deck
 resource "aws_route53_record" "ci" {
-  name    = "${aws_acm_certificate.ci.domain_validation_options.0.resource_record_name}"
-  type    = "${aws_acm_certificate.ci.domain_validation_options.0.resource_record_type}"
-  zone_id = "${aws_route53_zone.nested.zone_id}"
+  name    = aws_acm_certificate.ci.domain_validation_options.0.resource_record_name
+  type    = aws_acm_certificate.ci.domain_validation_options.0.resource_record_type
+  zone_id = aws_route53_zone.nested.zone_id
   records = ["${aws_acm_certificate.ci.domain_validation_options.0.resource_record_value}"]
   ttl     = 60
 }
 
 # spinnaker auth.
 resource "aws_route53_record" "gate" {
-  name    = "${aws_acm_certificate.gate.domain_validation_options.0.resource_record_name}"
-  type    = "${aws_acm_certificate.gate.domain_validation_options.0.resource_record_type}"
-  zone_id = "${aws_route53_zone.nested.zone_id}"
+  name    = aws_acm_certificate.gate.domain_validation_options.0.resource_record_name
+  type    = aws_acm_certificate.gate.domain_validation_options.0.resource_record_type
+  zone_id = aws_route53_zone.nested.zone_id
   records = ["${aws_acm_certificate.gate.domain_validation_options.0.resource_record_value}"]
   ttl     = 60
 }
+

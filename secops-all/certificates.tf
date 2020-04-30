@@ -32,6 +32,6 @@ resource "aws_acm_certificate" "gate" {
 }
 
 resource "aws_acm_certificate_validation" "gate" {
-  certificate_arn         = "${aws_acm_certificate.gate.arn}"
+  certificate_arn         = aws_acm_certificate.gate.arn
   validation_record_fqdns = ["${aws_route53_record.gate.fqdn}"]
 }
