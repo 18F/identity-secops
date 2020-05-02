@@ -73,7 +73,8 @@ rm -f /tmp/configmap.yml
 # this turns on the EBS persistent volume stuff
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 kubectl apply -f "$RUN_BASE/clusterconfig/base/ebs_storage_class.yml"
-kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 
 # some parts of logging need to be applied into kube-system
 kubectl apply -k "$RUN_BASE/logging/" -n kube-system
