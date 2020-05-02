@@ -75,6 +75,9 @@ kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernete
 kubectl apply -f "$RUN_BASE/clusterconfig/base/ebs_storage_class.yml"
 kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 
-# apply k8s config
+# some parts of logging need to be applied into kube-system
+kubectl apply -k "$RUN_BASE/logging/" -n kube-system
+
+# apply k8s config for this cluster
 kubectl apply -k "$RUN_BASE/clusterconfig/$TF_VAR_cluster_name"
 

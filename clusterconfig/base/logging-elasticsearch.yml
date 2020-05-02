@@ -218,12 +218,12 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "elasticsearch-logging-beljb-test"
+  name: "elasticsearch-logging-dsjny-test"
   annotations:
     "helm.sh/hook": test-success
 spec:
   containers:
-  - name: "elasticsearch-logging-upjiw-test"
+  - name: "elasticsearch-logging-wigyg-test"
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.6.2"
     command:
       - "sh"

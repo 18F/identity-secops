@@ -10,8 +10,3 @@ service:
       port: 8080
       protocol: TCP
       targetPort: 8080
-logstashConfig:
-  logstash.yml: |
-    output.elasticsearch:
-      hosts: ["http://elasticsearch-master:9200"]
-
