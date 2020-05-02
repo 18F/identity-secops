@@ -1,0 +1,13 @@
+resources:
+- clamav-daemonset.yml
+- logging-elasticsearch.yml
+- logging-filebeat.yml
+- logging-kibana.yml
+- logging-logstash.yml
+- namespaces.yml
+- nessus-deployment.yaml
+- nessus-service.yaml
+- nessus-volumeclaim.yaml
+- roles.yml
+- ebs_storage_class.yml
+

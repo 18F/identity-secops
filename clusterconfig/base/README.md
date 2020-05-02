@@ -1,10 +1,7 @@
 # Cluster Kubernetes Config
 
-This is where we create and configure core infrastructure services
-required to bootstrap the cluster like CI/CD, maybe clamav, etc.
-
-CI/CD then will be used to deploy everything else.
-
+This is where we create and configure the core services that are running
+in the cluster.
 
 ## ELK
 

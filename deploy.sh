@@ -70,19 +70,11 @@ terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
-# apply global k8s config
-kubectl apply -f "$RUN_BASE/secops-k8s/"
-
 # this turns on the EBS persistent volume stuff
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+kubectl apply -f "$RUN_BASE/clusterconfig/base/ebs_storage_class.yml"
 kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 
-# install all of the infrastructure k8s stuff in namespaces
-NAMESPACES="$(ls "$RUN_BASE"/secops-k8s/namespaces)"
-for i in $NAMESPACES ; do
-  echo "applying stuff in namespace $i"
-  kubectl apply -f "$RUN_BASE/secops-k8s/namespaces/$i" --namespace "$i"
-done
+# apply k8s config
+kubectl apply -k "$RUN_BASE/clusterconfig/$TF_VAR_cluster_name"
 
-# apply more common stuff here
-kubectl apply -R -f "$SCRIPT_BASE/common-k8s"
