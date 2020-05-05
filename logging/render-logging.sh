@@ -7,8 +7,8 @@
 helm repo add elastic https://helm.elastic.co
 helm repo update
 
-helm template elasticsearch-logging elastic/elasticsearch > ../clusterconfig/base/logging-elasticsearch.yml
+helm template elasticsearch-logging elastic/elasticsearch -f elasticsearch-values.yml > ../clusterconfig/base/logging-elasticsearch.yml
 helm template kibana elastic/kibana > ../clusterconfig/base/logging-kibana.yml
 helm template logstash elastic/logstash -f logstash-values.yml > ../clusterconfig/base/logging-logstash.yml
-helm template filebeat elastic/filebeat --namespace kube-system > logging-filebeat.yml
+helm template filebeat elastic/filebeat -f filebeat-values.yml --namespace kube-system > logging-filebeat.yml
 

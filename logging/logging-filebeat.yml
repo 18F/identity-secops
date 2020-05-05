@@ -31,7 +31,7 @@ data:
     
     output.elasticsearch:
       host: '${NODE_NAME}'
-      hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}'
+      hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master.default.svc:9200}'
 ---
 # Source: filebeat/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -94,7 +94,7 @@ spec:
     metadata:
       annotations:
         
-        configChecksum: 892634e1d8f4d3bc8dceecf0bbc2cc6de13d0be3277765a8da022a8dc640436
+        configChecksum: 2126a61bdec04ce26683df4c72659844a5c390c1ec6ea8233583409a771ea24
       name: "filebeat-filebeat"
       labels:
         app: "filebeat-filebeat"

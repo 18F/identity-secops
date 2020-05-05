@@ -70,11 +70,17 @@ terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
 
-# this turns on the EBS persistent volume stuff
-kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
-kubectl apply -f "$RUN_BASE/clusterconfig/base/ebs_storage_class.yml"
-kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+# this turns on the EBS persistent volume stuff and make it the default
+if kubectl describe sc ebs >/dev/null ; then
+	echo ebs persistant storage already set up
+else
+	kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+	kubectl apply -f "$RUN_BASE/clusterconfig/base/ebs_storage_class.yml"
+fi
+if kubectl get sc | grep -E ^gp2.*default >/dev/null ; then
+	kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+	kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+fi
 
 # some parts of logging need to be applied into kube-system
 kubectl apply -k "$RUN_BASE/logging/" -n kube-system
