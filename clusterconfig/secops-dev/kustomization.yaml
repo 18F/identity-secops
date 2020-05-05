@@ -1,0 +1,8 @@
+bases:
+- ../base
+resources:
+- nessus-namespace.yml
+- nessus-deployment.yaml
+- nessus-service.yaml
+- nessus-volumeclaim.yaml
+

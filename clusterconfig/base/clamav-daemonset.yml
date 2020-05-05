@@ -20,9 +20,13 @@ spec:
       containers:
       - name: clamd
         image: logindotgov/secops-clamav:master
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["SYS_ADMIN"]
         resources:
           limits:
-            memory: 3Gi
+            memory: 1.4Gi
           requests:
             cpu: 100m
             memory: 500Mi
