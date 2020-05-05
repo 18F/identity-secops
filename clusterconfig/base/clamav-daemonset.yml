@@ -20,6 +20,7 @@ spec:
       containers:
       - name: clamd
         image: logindotgov/secops-clamav:master
+        imagePullPolicy: Always
         securityContext:
           privileged: true
           capabilities:
