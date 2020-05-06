@@ -7,4 +7,4 @@ resources:
 - nessus-volumeclaim.yaml
 images:
   - name: logindotgov/secops-clamav
-    newTag: inotify
+    newTag: master
