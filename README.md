@@ -25,13 +25,14 @@ to start automation to support IR and assessment work
 	* ~~CircleCI?  Codebuild?  Spinnaker?  Concourse:  start with Codebuild~~
 	* ~~put stuff into ECR~~
 	* ~~get codepipeline to kick off builds~~
-	* retooling to do builds with circleci into docker hub, will be relying on spinnaker work being done by Mike
+	* ~~Do CI for nessus/clamav to push to docker hub~~
+	* Waiting for spinnaker work being done by Mike
 * Make sure that security is baked in
 	* IAM roles for access?
-	* Istio?
-	* Twistlock/Aqua/TenableCS?
+	* Istio for limiting outbound access and who can talk to what service?
+	* Twistlock/Aqua/TenableCS for scanning containers after build?
 	* ~~clamav~~
-	* falco
+	* ~~falco~~
 * Figure out system for running k8s on local system too?
 * super-stretch goal:  make helm chart for identity-idp and see if it works!
 	* Mike and others are doing this
@@ -50,6 +51,10 @@ to start automation to support IR and assessment work
 * clamav scan was terrible, not finding stuff in /tmp
 	* retooled to scan everything, but this takes a long time
 	* probably going to rejigger to do a scan on deploy, then inotify for changes
+* Everybody has a different idea about how to do all this:  long lived branches
+  vs trunk-based development, standalone vs hub/spoke.
+	* Held a meeting, presented options, did exercise to surface consensus:
+	  https://docs.google.com/document/d/1OtMXGJynZYuagcsIMDV9IzJjRyNmxVNVXz9Y78gcfOA/
 
 ## process
 
