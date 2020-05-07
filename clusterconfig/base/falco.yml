@@ -2218,6 +2218,8 @@ spec:
         checksum/rules: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
     spec:
       serviceAccountName: falco
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
@@ -2244,6 +2246,8 @@ spec:
             - "https://$(KUBERNETES_SERVICE_HOST)"
             - -pk
           env:
+            - name: FALCO_BPF_PROBE
+              value:
           volumeMounts:
             - mountPath: /host/var/run/docker.sock
               name: docker-socket
