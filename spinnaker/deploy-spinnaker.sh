@@ -8,7 +8,7 @@ set -e
 
 if [ "$#" -ne 2 ]; then
      echo "usage:  $0 <cluster_name> <base_domain>"
-     echo "example: $0 devopts-dev identitysandbox.gov"
+     echo "example: $0 devops-dev identitysandbox.gov"
      exit 1
 else
      export TF_VAR_cluster_name="$1"
@@ -41,11 +41,14 @@ for i in ${REQUIREDBINARIES} ; do
 done
 
 
-# some config
+# some aws config
 ACCOUNT=$(aws sts get-caller-identity | jq -r .Account)
 REGION="us-west-2"
 BUCKET="login-dot-gov-devops.${ACCOUNT}-${REGION}"
-
+export TF_VAR_oidc_endpoint=$(aws eks describe-cluster \
+     --name $TF_VAR_cluster_name \
+     --query "cluster.identity.oidc.issuer" \
+     --output text | sed -e "s/^https:\/\///")
 
 if [ -z "$GITHUB_TOKEN" ] ; then
   echo "GITHUB_TOKEN needs to be set so that the deploy webhooks can be set up"

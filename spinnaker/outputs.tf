@@ -14,7 +14,7 @@ spec:
         persistentStoreType: s3
         s3:
           bucket: "${aws_s3_bucket.spinnaker-s3.bucket}"
-          accessKeyId: "${aws_iam_access_key.spinnaker-s3.user}"
+          accessKeyId: "${aws_iam_access_key.spinnaker-s3.id}"
           secretAccessKey: "${aws_iam_access_key.spinnaker-s3.secret}"
           rootFolder: front50
     profiles:
@@ -63,8 +63,61 @@ spec:
             service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${aws_acm_certificate.gate.arn}"
           publicPort: 443
 SPINNAKEREOF
+
+dns_service_account = <<SAEOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-dns
+  namespace: identity-system
+  annotations:
+    eks.amazonaws.com/role-arn: ${aws_iam_role.spinnaker-transit.arn}
+SAEOF
+
+external_dns_deployment = <<DNSEOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: identity-system
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: external-dns
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      serviceAccountName: external-dns
+      containers:
+      - name: external-dns
+        image: registry.opensource.zalan.do/teapot/external-dns:latest
+        args:
+        - --source=service
+        - --source=ingress
+        - --domain-filter=${var.cluster_name}.v2.${var.base_domain}
+        - --provider=aws
+        - --aws-prefer-cname
+        - --policy=upsert-only
+        - --aws-zone-type=public
+        - --registry=noop
+        - --log-level=debug
+      securityContext:
+        fsGroup: 65534
+DNSEOF
 }
 
 output "spinnaker-service" {
   value = local.spinnaker_service
+}
+
+output "spinnaker-external-dns-service-account" {
+  value = local.dns_service_account
+}
+
+output "spinnaker-external-dns-deploy" {
+  value = local.external_dns_deployment
 }

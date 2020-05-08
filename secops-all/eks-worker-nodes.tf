@@ -19,8 +19,7 @@ resource "aws_eks_node_group" "secops" {
   depends_on = [
     aws_iam_role_policy_attachment.secops-node-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.secops-node-AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.secops-node-AmazonEC2ContainerRegistryReadOnly,
-    aws_iam_role_policy_attachment.secops-node-spinnaker-s3
+    aws_iam_role_policy_attachment.secops-node-AmazonEC2ContainerRegistryReadOnly
   ]
 }
 
