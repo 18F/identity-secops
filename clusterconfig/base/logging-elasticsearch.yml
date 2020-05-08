@@ -107,14 +107,16 @@ spec:
         runAsUser: 1000
       affinity:
         podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - "elasticsearch-master"
-            topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - "elasticsearch-master"
       terminationGracePeriodSeconds: 120
       volumes:
       initContainers:
@@ -187,8 +189,8 @@ spec:
             cpu: 1000m
             memory: 2Gi
           requests:
-            cpu: 1000m
-            memory: 2Gi
+            cpu: 100m
+            memory: 1Gi
         env:
           - name: node.name
             valueFrom:
@@ -218,12 +220,12 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "elasticsearch-logging-nxppv-test"
+  name: "elasticsearch-logging-eivis-test"
   annotations:
     "helm.sh/hook": test-success
 spec:
   containers:
-  - name: "elasticsearch-logging-dpwyk-test"
+  - name: "elasticsearch-logging-flmak-test"
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.6.2"
     command:
       - "sh"
