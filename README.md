@@ -56,14 +56,32 @@ to start automation to support IR and assessment work
 	* Held a meeting, presented options, did exercise to surface consensus:
 	  https://docs.google.com/document/d/1OtMXGJynZYuagcsIMDV9IzJjRyNmxVNVXz9Y78gcfOA/
 
-## process
+## Process
 
 * `brew install kubectl`
 * `brew install aws-iam-authenticator`
 * make sure that your environment is set up to point at the AWS account that you want
   the cluster to live with `AWS_PROFILE` or AWS Vault.
-* First time: `./setup.sh <clustername>` where `clustername` is something like `secops-dev`
+* Deploy Kubernetes
+* Optionally, deploy Spinnaker.
+
+### Deploying Kubernetes
+
+* First time: `./setup.sh <clustername>` where `clustername` is something like `secops-dev` or `devops-test`
 * Deploys to already existing cluster:  `./deploy.sh <clustername>`
+
+### Deploying Spinnaker
+
+**Requirements:**
+* Kubernetes must be deployed.
+* You must have an existing, pre-deployed Route53 zone in the same AWS account you deploy both Kubernetes and Spinnaker to. The `./deploy-spinnaker.sh` script will be importing the Zone ID.
+
+**Steps:**
+* Deploy Kubernetes.
+* Run `./setup-spinnaker.sh <cluster_name>` to prep the terraform state.
+* Once that's run, run `./deploy-spinnaker <cluster_name> <base_domain>`.
+  * `<cluster_name>`: this should be the same the Kubernetes cluster that's deployed.
+  * `<base_domain>`: The name of the Route53 zone you want to use. For example, `identitysandbox.gov`
 
 
 ## Notes

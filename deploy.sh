@@ -87,4 +87,3 @@ kubectl apply -k "$RUN_BASE/logging/" -n kube-system
 
 # apply k8s config for this cluster
 kubectl apply -k "$RUN_BASE/clusterconfig/$TF_VAR_cluster_name"
-
