@@ -14,7 +14,7 @@ resource "aws_eks_cluster" "secops" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    #prevent_destroy = true
   }
 
   version = "1.15"

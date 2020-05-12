@@ -42,11 +42,6 @@ SCRIPT_BASE=$(dirname "$0")
 RUN_BASE=$(pwd)
 
 
-if [ -z "$GITHUB_TOKEN" ] ; then
-  echo "GITHUB_TOKEN needs to be set so that the deploy webhooks can be set up"
-  exit 1
-fi
-
 # clean up tfstate files so that we get them from the backend
 find . -name terraform.tfstate -print0 | xargs -0 rm
 
@@ -75,15 +70,13 @@ if kubectl describe sc ebs >/dev/null ; then
 	echo ebs persistant storage already set up
 else
 	kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
-	kubectl apply -f "$RUN_BASE/clusterconfig/base/ebs_storage_class.yml"
+	kubectl apply -f "$RUN_BASE/install/ebs_storage_class.yml"
 fi
 if kubectl get sc | grep -E ^gp2.*default >/dev/null ; then
 	kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 	kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 fi
 
-# some parts of logging need to be applied into kube-system
-kubectl apply -k "$RUN_BASE/logging/" -n kube-system
-
 # apply k8s config for this cluster
-kubectl apply -k "$RUN_BASE/clusterconfig/$TF_VAR_cluster_name"
+kubectl apply -k "$RUN_BASE/install"
+

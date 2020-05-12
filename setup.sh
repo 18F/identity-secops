@@ -74,3 +74,4 @@ terraform import aws_dynamodb_table.tf-lock-table secops_terraform_locks
 
 # Here we go!  This is where the magic happens.  :-)
 "$RUN_BASE/$SCRIPT_BASE/deploy.sh" "$1"
+
