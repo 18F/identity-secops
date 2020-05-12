@@ -14,8 +14,8 @@ spec:
             - --git-poll-interval=5m
             - --sync-interval=5m
             - --ssh-keygen-dir=/var/fluxd/keygen
-            - --git-branch=master
+            - --git-branch=fluxdeploy
             - --git-path=cluster
-            - --git-url=git@github.com:timspencer/identity-secops
+            - --git-url=git@github.com:18F/identity-secops
             - --sync-garbage-collection=fluxd
             - --git-readonly
