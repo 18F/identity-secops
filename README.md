@@ -63,8 +63,7 @@ to start automation to support IR and assessment work
 * `brew install kubectl aws-iam-authenticator fluxctl`
 * make sure that your environment is set up to point at the AWS account that you want
   the cluster to live with `AWS_PROFILE` or AWS Vault.
-* Deploy Kubernetes
-* Optionally, deploy Spinnaker.
+* Deploy Kubernetes (see below)
 
 ### Deploying Kubernetes
 
@@ -92,6 +91,7 @@ k8s stuff:
 * https://github.com/fluxcd/multi-tenancy-team1
 * https://docs.flagger.app/tutorials/kubernetes-blue-green
 * https://aws.amazon.com/blogs/opensource/aws-service-operator-kubernetes-available/ (probably want to manage this externally, but interesting)
+* https://monzo.com/blog/controlling-outbound-traffic-from-kubernetes
 
 Nessus config stuff
 * setup for Docker example:  https://github.com/SteveMcGrath/docker-nessus_scanner
