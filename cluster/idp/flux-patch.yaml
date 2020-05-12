@@ -27,4 +27,4 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: flux
-    namespace: idp-dev
+    namespace: idp
