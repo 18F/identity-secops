@@ -11,6 +11,7 @@ to start automation to support IR and assessment work
 	  automatically.
 	* If Nessus dies, it should be restarted/rebuilt.
 * Secrets and maybe artifacts used for build/deploy should be persisted somewhere
+* Logging and security should be built in
 * System should be roughly generalizable to other purposes
 
 
@@ -27,15 +28,17 @@ to start automation to support IR and assessment work
 	* ~~get codepipeline to kick off builds~~
 	* ~~Do CI for nessus/clamav to push to docker hub~~
 	* Waiting for spinnaker work being done by Mike
+	* While waiting, try out flux!
 * Make sure that security is baked in
 	* IAM roles for access?
-	* Istio for limiting outbound access and who can talk to what service?
+	* Istio for limiting outbound access and who can talk to what service?  Maybe just Network Policies?
 	* Twistlock/Aqua/TenableCS for scanning containers after build?
 	* ~~clamav~~
 	* ~~falco~~
 * Figure out system for running k8s on local system too?
 * super-stretch goal:  make helm chart for identity-idp and see if it works!
 	* Mike and others are doing this
+	* Managed to get container working with https://github.com/18F/identity-idp/pull/3759
 
 ## Problems encountered so far
 * EKS/Fargate only works in us-east-* regions, we are in us-west-2.
@@ -56,7 +59,7 @@ to start automation to support IR and assessment work
 	* Held a meeting, presented options, did exercise to surface consensus:
 	  https://docs.google.com/document/d/1OtMXGJynZYuagcsIMDV9IzJjRyNmxVNVXz9Y78gcfOA/
 * Spinnaker deploy seems to be broken
-	* removed remnants, tried out [fluxcd](https://github.com/fluxcd/flux)
+	* removed remnants, tried out [fluxcd with flagger](https://github.com/fluxcd/flux)
 
 ## Process
 
@@ -77,8 +80,21 @@ to start automation to support IR and assessment work
 	  to deploy https://github.com/timothy-spencer/idp-dev to the idp namespace.  You can also
 	  look at https://github.com/timothy-spencer/idp-dev/workloads/idp-bluegreen for a very basic example of how to
 	  do blue/green deploys with tests and so on.
-* Deploy to already existing cluster:  `./deploy.sh <clustername>`
+* Update already existing cluster:  `./deploy.sh <clustername>`
 
+### Deploying Notes
+
+This was based heavily off of the [fluxcd multi-tenancy template](https://github.com/fluxcd/multi-tenancy).
+Since we are not just deploying to one cluster, but to several, we have extended the setup to handle
+multiple cluster types.
+
+The underlying fluxcd stuff relies heavily on [kustomize](https://github.com/kubernetes-sigs/kustomize) to
+pull together and customize the various manifests out there.  We have been trying to keep our configuration
+rendered out into flat files rather than relying on remote repos or helm charts that may or may not be working.
+Wherever possible, we are using some sort of `render_<thing>.sh` script to render the file(s) out for that
+service.  In the cases where we have not, they are usually based on some prior art.  If you want to see what
+is being generated for a particular thing, you should be able to say something like
+`kustomize build cluster/` or `kustomize build base/elk` or whatever to see what is being applied.
 
 
 ## Notes
