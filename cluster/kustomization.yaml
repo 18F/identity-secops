@@ -4,4 +4,4 @@ bases:
   - ../base/clamav/
   - ../base/elk/
   - ./common/
-  - ./idp-dev/
+  - ./idp/

@@ -1,4 +1,4 @@
-namespace: idp-dev
+namespace: idp
 resources:
   - namespace.yaml
   - rbac.yaml
