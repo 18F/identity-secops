@@ -68,7 +68,7 @@ spec:
             - --git-url=git@github.com:fluxcd/flux-get-started
             - --git-branch=master
             - --git-path=
-            - --sync-garbage-collection=fluxd
+            - --sync-garbage-collection
             - --git-readonly
           resources:
             requests:

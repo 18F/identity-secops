@@ -17,7 +17,7 @@ spec:
             - --k8s-allow-namespace=idp
             - --git-url=git@github.com:timspencer/idp-dev
             - --git-branch=master
-            - --sync-garbage-collection=fluxd
+            - --sync-garbage-collection
             - --git-readonly
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1

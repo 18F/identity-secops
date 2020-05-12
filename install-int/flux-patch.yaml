@@ -17,5 +17,5 @@ spec:
             - --git-branch=fluxdeploy
             - --git-path=cluster-int
             - --git-url=git@github.com:18F/identity-secops
-            - --sync-garbage-collection=fluxd
+            - --sync-garbage-collection
             - --git-readonly
