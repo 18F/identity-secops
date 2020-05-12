@@ -1,0 +1,4 @@
+namespace: flagger-system
+resources:
+  - namespace.yaml
+  - flagger-grafana.yml
