@@ -55,11 +55,12 @@ to start automation to support IR and assessment work
   vs trunk-based development, standalone vs hub/spoke.
 	* Held a meeting, presented options, did exercise to surface consensus:
 	  https://docs.google.com/document/d/1OtMXGJynZYuagcsIMDV9IzJjRyNmxVNVXz9Y78gcfOA/
+* Spinnaker deploy seems to be broken
+	* removed remnants, tried out [fluxcd](https://github.com/fluxcd/flux)
 
 ## Process
 
-* `brew install kubectl`
-* `brew install aws-iam-authenticator`
+* `brew install kubectl aws-iam-authenticator fluxctl`
 * make sure that your environment is set up to point at the AWS account that you want
   the cluster to live with `AWS_PROFILE` or AWS Vault.
 * Deploy Kubernetes
@@ -68,20 +69,17 @@ to start automation to support IR and assessment work
 ### Deploying Kubernetes
 
 * First time: `./setup.sh <clustername>` where `clustername` is something like `secops-dev` or `devops-test`
-* Deploys to already existing cluster:  `./deploy.sh <clustername>`
+  You can also select a cluster type with `./setup.sh <clustername> <clustertype>`, which will select the
+  `cluster-<clustertype>` directory for deploying stuff.  This lets you have a standalone or hub/spoke architecture.
+	* Once the cluster is up, use `fluxctl --k8s-fwd-ns=flux-system identity` to get a readonly deploy key
+	  to add to the git repo that the cluster is deployed from.  Once that is enabled, the code under the
+	  clustertype dir will be deployed automatically as you check it into git.
+	* Other repos can be deployed with flux as well.  Look at how `cluster/idp` is configured
+	  to deploy https://github.com/timothy-spencer/idp-dev to the idp namespace.  You can also
+	  look at https://github.com/timothy-spencer/idp-dev/workloads/idp-bluegreen for a very basic example of how to
+	  do blue/green deploys with tests and so on.
+* Deploy to already existing cluster:  `./deploy.sh <clustername>`
 
-### Deploying Spinnaker
-
-**Requirements:**
-* Kubernetes must be deployed.
-* You must have an existing, pre-deployed Route53 zone in the same AWS account you deploy both Kubernetes and Spinnaker to. The `./deploy-spinnaker.sh` script will be importing the Zone ID.
-
-**Steps:**
-* Deploy Kubernetes.
-* Run `./setup-spinnaker.sh <cluster_name>` to prep the terraform state.
-* Once that's run, run `./deploy-spinnaker <cluster_name> <base_domain>`.
-  * `<cluster_name>`: this should be the same the Kubernetes cluster that's deployed.
-  * `<base_domain>`: The name of the Route53 zone you want to use. For example, `identitysandbox.gov`
 
 
 ## Notes
@@ -89,6 +87,11 @@ k8s stuff:
 * https://blog.gruntwork.io/comprehensive-guide-to-eks-worker-nodes-94e241092cbe#f8b9
 * https://aws.amazon.com/blogs/opensource/getting-started-istio-eks/
 * https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html
+* https://github.com/fluxcd/flux
+* https://github.com/fluxcd/multi-tenancy
+* https://github.com/fluxcd/multi-tenancy-team1
+* https://docs.flagger.app/tutorials/kubernetes-blue-green
+* https://aws.amazon.com/blogs/opensource/aws-service-operator-kubernetes-available/ (probably want to manage this externally, but interesting)
 
 Nessus config stuff
 * setup for Docker example:  https://github.com/SteveMcGrath/docker-nessus_scanner
