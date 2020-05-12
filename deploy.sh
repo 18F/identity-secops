@@ -71,6 +71,7 @@ rm -f /tmp/configmap.yml
 terraform output config_map_aws_auth > /tmp/configmap.yml
 kubectl apply -f /tmp/configmap.yml
 rm -f /tmp/configmap.yml
+popd
 
 # this turns on the EBS persistent volume stuff and make it the default
 if kubectl describe sc ebs >/dev/null ; then
@@ -79,7 +80,7 @@ else
 	kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 	kubectl apply -f "$RUN_BASE/install/ebs_storage_class.yml"
 fi
-if kubectl get sc | grep -E ^gp2.*default >/dev/null ; then
+if kubectl get sc | grep -E '^gp2.*default' >/dev/null ; then
 	kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 	kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 fi
