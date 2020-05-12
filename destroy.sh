@@ -41,7 +41,7 @@ for i in ${REQUIREDBINARIES} ; do
      checkbinary "$i"
 done
 
-pushd "$RUN_BASE/$SCRIPT_BASE/secops-all"
+pushd "$RUN_BASE/$SCRIPT_BASE/terraform"
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=secops_terraform_locks" \

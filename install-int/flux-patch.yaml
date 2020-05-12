@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flux
+spec:
+  template:
+    spec:
+      containers:
+        - name: flux
+          args:
+            - --manifest-generation=true
+            - --memcached-hostname=flux-memcached.flux-system
+            - --memcached-service=
+            - --git-poll-interval=5m
+            - --sync-interval=5m
+            - --ssh-keygen-dir=/var/fluxd/keygen
+            - --git-branch=master
+            - --git-path=cluster-int
+            - --git-url=git@github.com:timspencer/identity-secops
+            - --sync-garbage-collection=fluxd
+            - --git-readonly

@@ -1,0 +1,11 @@
+namespace: flux-system
+resources:
+  - namespace.yaml
+  - rbac.yaml
+  - psp.yaml
+  - ebs_storage_class.yml
+bases:
+  - ../base/flux/
+  - ../base/memcached/
+patchesStrategicMerge:
+  - flux-patch.yaml

@@ -1,0 +1,12 @@
+resources:
+  - account.yaml
+  - role.yaml
+  - git-key.yaml
+  - deployment.yaml
+configMapGenerator:
+  - name: flux-kube-config
+    files:
+      - kubeconfig.yaml
+images:
+  - name: fluxcd/flux
+    newTag: 1.17.0
