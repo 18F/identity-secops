@@ -1,3 +1,0 @@
-namespace: flagger-system
-resources:
-  - flagger-grafana.yml

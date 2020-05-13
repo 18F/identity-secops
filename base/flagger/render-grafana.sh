@@ -6,7 +6,7 @@
 
 helm repo add flagger https://flagger.app
 helm repo update
-kubectl config set-context --current --namespace=flagger
+kubectl config set-context --current --namespace=flagger-system
 
 helm template grafana flagger/grafana -f grafana-values.yml > flagger-grafana.yml
 
