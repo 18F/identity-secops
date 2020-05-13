@@ -3,5 +3,6 @@ bases:
   - ../base/clamav/
   - ../base/flagger/
   - ../base/elk/
+  - ../base/dashboard/
   - ./common/
   - ./idp/
