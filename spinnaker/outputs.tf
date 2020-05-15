@@ -22,6 +22,23 @@ spec:
           overrideBaseUrl: "https://gate.${var.cluster_name}.v2.${var.base_domain}"
         uiSecurity:
           overrideBaseUrl: "https://ci.${var.cluster_name}.v2.${var.base_domain}"
+        authn:
+          oauth2:
+            enabled: true
+            client:
+              clientId: "${var.spinnaker_oauth_client_id}"
+              clientSecret: "${var.spinnaker_oauth_client_secret}"
+              accessTokenUri: "${var.spinnaker_oauth_access_token_uri}"
+              userAuthorizationUri: "${var.spinnaker_oauth_user_authorization_uri}"
+              scope: "openid"
+            provider: OTHER
+            resource:
+              userInfoUri: "${var.spinnaker_oauth_userinfo_uri}"
+            userInfoMapping:
+              email: email
+              firstName: given_name
+              lastName: family_name
+              username: email
     profiles:
       clouddriver: {}
       deck:

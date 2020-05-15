@@ -74,11 +74,36 @@ to start automation to support IR and assessment work
 
 **Requirements:**
 * Kubernetes must be deployed.
-* You must have an existing, pre-deployed Route53 zone in the same AWS account you deploy both Kubernetes and Spinnaker to. The `./deploy-spinnaker.sh` script will be importing the Zone ID.
+* You must have an existing, pre-deployed Route53 zone in the same AWS account you deploy both Kubernetes and Spinnaker to. The [`spinnaker/deploy-spinnaker.sh`](spinnaker/deploy-spinnaker.sh) script will be importing the Zone ID.
+* You have an OAuth2 client with the `authorization_code` type for the authentication scheme.
+
+**Creating an OAuth2 Client**
+
+Once you've set up your local `uaa` client, you can create a client with this command:
+
+```
+uaa create-client spinnaker-dev \
+	-s "<pass>" \
+	--authorized_grant_types authorization_code \
+	--display_name "Spinnaker Dev" \
+	--scope "ops.read,ops.write,appdev.read,appdev.write,openid" \
+	--redirect_uri "https://<gate-url>/login,http://localhost:8080"
+```
+
+For development work, you need to ensure you have `http://localhost:8080` in the redirect URL list so you can properly authenticate and test the client locally, otherwise it won't work.
 
 **Steps:**
 * Deploy Kubernetes.
+* Enter the `spinnaker` directory.
 * Run `./setup-spinnaker.sh <cluster_name>` to prep the terraform state.
+* Export some variables. You can get the endpoints from the `https://<auth-server>/.well-known/openid-configuration` URL.
+  * `export TF_VAR_spinnaker_oauth_client_id=""`
+    * The OAuth2 client ID you want to use from the auth server.
+  * `export TF_VAR_spinnaker_oauth_client_secret=""`
+    * The OAuth2 client secret you want to use from the auth server.
+  * `export TF_VAR_spinnaker_oauth_access_token_uri=""`
+  * `export TF_VAR_spinnaker_oauth_userinfo_uri=""`
+  * `export TF_VAR_spinnaker_oauth_user_authorization_uri=""`
 * Once that's run, run `./deploy-spinnaker <cluster_name> <base_domain>`.
   * `<cluster_name>`: this should be the same the Kubernetes cluster that's deployed.
   * `<base_domain>`: The name of the Route53 zone you want to use. For example, `identitysandbox.gov`
