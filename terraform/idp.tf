@@ -1,0 +1,1 @@
+# create idp resources here:  postgres, redis, kms

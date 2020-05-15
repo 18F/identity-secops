@@ -48,6 +48,27 @@ users:
         - "-i"
         - "${var.cluster_name}"
 KUBECONFIG
+
+#   idp_db_service = <<DBSERVICE
+# apiVersion: v1
+# kind: Service
+# metadata: 
+#   labels: 
+#     name: idp-postgres
+#   name: idp-postgres
+# spec: 
+#   type: ExternalName
+#   externalName: ${aws_db_instance.idp.address}
+#   ports: 
+#     - port: 5432
+#       protocol: TCP
+#       targetPort: ${aws_db_instance.idp.port}
+# DBSERVICE
+
+#   idp_redis_service = <<REDISSERVICE
+# XXX
+# REDISSERVICE
+
 }
 
 output "config_map_aws_auth" {
@@ -61,3 +82,8 @@ output "kubeconfig" {
 output "cluster_arn" {
   value = aws_eks_cluster.secops.arn
 }
+
+# output "idp_db_service" {
+#   value = local.idp_redis_service
+# }
+

@@ -1,0 +1,8 @@
+bases:
+  - ../base/falco/
+  - ../base/clamav/
+  - ../base/flagger/
+  - ../base/elk/
+  - ../base/dashboard/
+  - ./common/
+  - ./idp/
