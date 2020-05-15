@@ -37,6 +37,7 @@ checkbinary() {
 
 REQUIREDBINARIES="
      terraform
+     kubectl
 "
 for i in ${REQUIREDBINARIES} ; do
      checkbinary "$i"
@@ -52,6 +53,14 @@ terraform init -backend-config="bucket=$BUCKET" \
 terraform state rm aws_route53_zone.dns
 terraform state rm aws_s3_bucket.tf-state
 terraform state rm aws_dynamodb_table.tf-lock-table
+
+# clean up k8s/aws integrations.
+terraform output alb-controller | kubectl delete --wait -f -
+terraform output spinnaker-service | kubectl delete --wait -f -
+terraform output spinnaker-external-dns-service-account | kubectl delete --wait -f -
+terraform output spinnaker-external-dns-deploy | kubectl delete --wait -f -
+terraform output spinnaker-ingress | kubectl delete --wait -f -
+
 terraform destroy
 
 # clean up spinnaker

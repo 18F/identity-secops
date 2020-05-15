@@ -76,8 +76,9 @@ terraform apply
 # apply base spinnaker
 kubectl apply -f "." --wait
 
-# update deploy spinnaker
-rm -f spinnaker.yml
-terraform output spinnaker-service > spinnaker.yml
-kubectl apply -f spinnaker.yml
-rm -f spinnaker.yml
+# update deploy the rest
+terraform output alb-controller | kubectl apply -f -
+terraform output spinnaker-service | kubectl apply -f -
+terraform output spinnaker-external-dns-service-account | kubectl apply -f -
+terraform output spinnaker-external-dns-deploy | kubectl apply -f -
+terraform output spinnaker-ingress | kubectl apply -f -
