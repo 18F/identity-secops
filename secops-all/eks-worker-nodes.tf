@@ -16,6 +16,8 @@ resource "aws_eks_node_group" "secops" {
     min_size     = 2
   }
 
+  disk_size = 120
+
   depends_on = [
     aws_iam_role_policy_attachment.secops-node-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.secops-node-AmazonEKS_CNI_Policy,

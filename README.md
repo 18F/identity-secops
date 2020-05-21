@@ -108,6 +108,16 @@ For development work, you need to ensure you have `http://localhost:8080` in the
   * `<cluster_name>`: this should be the same the Kubernetes cluster that's deployed.
   * `<base_domain>`: The name of the Route53 zone you want to use. For example, `identitysandbox.gov`
 
+**Bootstrapping RDS**
+
+Unfortunately there's no easy way to bootstrap the Clouddriver database that Spinnaker needs without a lot of manual steps. This only needs to be done once, on first initialisation of RDS, and then these steps don't need to be taken again. Basically, we need to punch a hole in the firewall to create a couple things in the database, then we are going to tidy up what we did.
+
+1. Make sure you are in the `spinnaker` directory.
+1. In [spinnaker/db.tf](spinnaker/db.tf), make sure the `data.external.personal-ip` and `aws_security_group.allow-local-mysql` structs are uncommented.
+1. Run the `./deploy-spinnaker.sh` script from the previous section again. This punches a hole in the firewall with your public IP.
+1. Connect to the database via the CLI.
+1. Execute the SQL in `bootstrap.sql`.
+
 
 ## Notes
 k8s stuff:

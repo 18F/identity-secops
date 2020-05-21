@@ -73,10 +73,10 @@ okay_to_fail terraform import aws_route53_zone.dns $HOSTED_ZONE
 
 terraform apply
 
-# apply base spinnaker
+# apply base
 kubectl apply -f "." --wait
 
-# update deploy the rest
+# deploy the rest
 terraform output alb-controller | kubectl apply -f -
 terraform output spinnaker-service | kubectl apply -f -
 terraform output spinnaker-external-dns-service-account | kubectl apply -f -

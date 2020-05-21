@@ -1,0 +1,11 @@
+CREATE DATABASE `clouddriver` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+GRANT
+  SELECT, INSERT, UPDATE, DELETE, CREATE, EXECUTE, SHOW VIEW
+ON `clouddriver`.*
+TO 'clouddriver'@'%' IDENTIFIED BY "clouddriver123!";
+
+GRANT
+  SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, LOCK TABLES, EXECUTE, SHOW VIEW
+ON `clouddriver`.*
+TO 'clouddriver'@'%' IDENTIFIED BY "clouddriver123!";

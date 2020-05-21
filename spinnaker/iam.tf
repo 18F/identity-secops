@@ -232,3 +232,35 @@ resource "aws_iam_role_policy_attachment" "spinnaker-transit" {
   role       = aws_iam_role.spinnaker-transit.name
   policy_arn = aws_iam_policy.spinnaker-transit.arn
 }
+
+resource "aws_iam_user" "spinnaker-rds" {
+  name = "spinnaker-rds-bot"
+  path = "/spinnaker/"
+}
+
+resource "aws_iam_access_key" "spinnaker-rds" {
+  user = aws_iam_user.spinnaker-s3.name
+}
+
+# take note the db user is `clouddriver` and not `spinnaker-rds-bot`.
+resource "aws_iam_user_policy" "spinnaker-rds" {
+  name = "spinnaker-rds-policy"
+  user = aws_iam_user.spinnaker-rds.name
+
+  policy = <<EOF
+{
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Effect": "Allow",
+         "Action": [
+             "rds-db:connect"
+         ],
+         "Resource": [
+             "arn:aws:rds-db:${var.region}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_rds_cluster.spinnaker.cluster_resource_id}/clouddriver"
+         ]
+      }
+   ]
+}
+EOF
+}

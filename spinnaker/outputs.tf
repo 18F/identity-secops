@@ -10,6 +10,22 @@ spec:
   spinnakerConfig:
     config:
       version: 2.15.1
+      deploymentEnvironment:
+        customSizing:
+          spin-clouddriver:
+            replicas: 3
+          spin-deck:
+            replicas: 3
+          spin-gate:
+            replicas: 3
+          spin-echo:
+            replicas: 3
+          spin-front50:
+            replicas: 3
+          spin-rosco:
+            replicas: 3
+          spin-orca:
+            replicas: 3
       persistentStorage:
         persistentStoreType: s3
         s3:
@@ -40,7 +56,40 @@ spec:
               lastName: family_name
               username: email
     profiles:
-      clouddriver: {}
+      clouddriver:
+        sql:
+          enabled: true
+          taskRepository:
+            enabled: true
+          cache:
+            enabled: true
+            readBatchSize: 500
+            writeBatchSize: 300
+          scheduler:
+            enabled: true
+          connectionPools:
+            default:
+              # additional connection pool parameters are available here,
+              # for more detail and to view defaults, see:
+              # https://github.com/spinnaker/kork/blob/master/kork-sql/src/main/kotlin/com/netflix/spinnaker/kork/sql/config/ConnectionPoolProperties.kt
+              default: true
+              jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver
+              user: clouddriver
+              password: "clouddriver123!"
+            tasks:
+              user: clouddriver
+              jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver
+          migration:
+            user: clouddriver
+            jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver
+        redis:
+          enabled: false
+          cache:
+            enabled: false
+          scheduler:
+            enabled: false
+          taskRepository:
+            enabled: false
       deck:
         settings-local.js: |
           window.spinnakerSettings.feature.kustomizeEnabled = true;
@@ -230,4 +279,8 @@ output "alb-controller" {
 
 output "spinnaker-ingress" {
   value = local.spinnaker_ingress
+}
+
+output "spinnaker-db-host" {
+  value = aws_rds_cluster.spinnaker.endpoint
 }
