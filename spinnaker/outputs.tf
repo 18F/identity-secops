@@ -13,19 +13,19 @@ spec:
       deploymentEnvironment:
         customSizing:
           spin-clouddriver:
-            replicas: 3
+            replicas: 2
           spin-deck:
-            replicas: 3
+            replicas: 2
           spin-gate:
-            replicas: 3
+            replicas: 2
           spin-echo:
-            replicas: 3
+            replicas: 1
           spin-front50:
-            replicas: 3
+            replicas: 1
           spin-rosco:
-            replicas: 3
+            replicas: 1
           spin-orca:
-            replicas: 3
+            replicas: 1
       persistentStorage:
         persistentStoreType: s3
         s3:
