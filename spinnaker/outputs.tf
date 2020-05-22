@@ -9,23 +9,23 @@ metadata:
 spec:
   spinnakerConfig:
     config:
-      version: 2.15.1
+      version: 2.19.8
       deploymentEnvironment:
         customSizing:
           spin-clouddriver:
-            replicas: 2
+            replicas: 3
           spin-deck:
-            replicas: 2
+            replicas: 3
           spin-gate:
-            replicas: 2
+            replicas: 3
           spin-echo:
-            replicas: 1
+            replicas: 3
           spin-front50:
-            replicas: 1
+            replicas: 3
           spin-rosco:
-            replicas: 1
+            replicas: 3
           spin-orca:
-            replicas: 1
+            replicas: 3
       persistentStorage:
         persistentStoreType: s3
         s3:
@@ -73,15 +73,13 @@ spec:
               # for more detail and to view defaults, see:
               # https://github.com/spinnaker/kork/blob/master/kork-sql/src/main/kotlin/com/netflix/spinnaker/kork/sql/config/ConnectionPoolProperties.kt
               default: true
-              jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver
-              user: clouddriver
-              password: "clouddriver123!"
+              jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver?user=clouddriver&password=clouddriver123
             tasks:
               user: clouddriver
-              jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver
+              jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver?user=clouddriver&password=clouddriver123
           migration:
             user: clouddriver
-            jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver
+            jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/clouddriver?user=clouddriver&password=clouddriver123
         redis:
           enabled: false
           cache:
@@ -96,7 +94,7 @@ spec:
           window.spinnakerSettings.feature.artifactsRewrite = true;
       echo: {}   
       fiat: {}   
-      front50: {}
+      front50: {}  
       gate: 
         server:
           tomcat:
@@ -106,14 +104,38 @@ spec:
             httpsServerPort: X-Forwarded-Port
       igor: {}   
       kayenta: {}
-      orca: {}   
+      orca:
+        sql:
+          enabled: true
+          connectionPool:
+            jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/orca?user=orca&password=orca123
+            connectionTimeout: 5000
+            maxLifetime: 30000
+          migration:
+            jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/orca?user=orca&password=orca123
+        executionRepository:
+          sql:
+            enabled: true
+          redis:
+            enabled: false
+        monitor:
+          activeExecutions:
+            redis: false
       rosco: {}  
     service-settings:
       clouddriver: {}
       deck: {}
       echo: {}
       fiat: {}
-      front50: {}
+      front50:
+        sql:
+          enabled: true
+          connectionPools:
+            default:
+              default: true
+              jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/front50?user=front50&password=front50123   
+          migration:
+            jdbcUrl: jdbc:mysql://${aws_rds_cluster.spinnaker.endpoint}:3306/front50?user=front50&password=front50123 
       gate: {}
       igor: {}
       kayenta: {}

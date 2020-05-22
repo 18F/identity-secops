@@ -42,9 +42,9 @@ done
 
 
 # some aws config
+export AWS_REGION="us-west-2"
 ACCOUNT=$(aws sts get-caller-identity | jq -r .Account)
-REGION="us-west-2"
-BUCKET="login-dot-gov-devops.${ACCOUNT}-${REGION}"
+BUCKET="login-dot-gov-devops.${ACCOUNT}-${AWS_REGION}"
 export TF_VAR_oidc_endpoint=$(aws eks describe-cluster \
      --name $TF_VAR_cluster_name \
      --query "cluster.identity.oidc.issuer" \
@@ -62,7 +62,7 @@ find . -name terraform.tfstate -print0 | xargs -0 rm
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
       -backend-config="dynamodb_table=devops_terraform_locks" \
-      -backend-config="region=$REGION" \
+      -backend-config="region=$AWS_REGION" \
       -upgrade
 
 # grab the hosted zone and import it.

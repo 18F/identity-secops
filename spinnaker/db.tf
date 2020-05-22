@@ -77,8 +77,16 @@ resource "aws_route_table_association" "spinnaker-db-c" {
 See the README to understand why these are commented out.
 */
 # see: https://www.terraform.io/docs/providers/external/data_source.html
+# todo (mxplusb): implement the aws_ip_ranges data source.
 data "external" "personal-ip" {
   program = ["curl", "https://ipecho.io/json"]
+}
+
+data "external" "amazon-ranges" {
+  program = [
+    "python3",
+    "${path.cwd}/aws-ranges.py"
+  ]
 }
 
 resource "aws_default_security_group" "allow-local-mysql" {
@@ -89,7 +97,10 @@ resource "aws_default_security_group" "allow-local-mysql" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["${data.external.personal-ip.result.ip}/32"]
+    cidr_blocks = flatten([
+      "${data.external.personal-ip.result.ip}/32",
+      keys(data.external.amazon-ranges.result)
+    ])
   }
 }
 
@@ -139,8 +150,8 @@ resource "aws_rds_cluster" "spinnaker" {
   skip_final_snapshot     = true
   apply_immediately       = false
 
-  engine         = "aurora-mysql"
-  engine_version = "5.7.12"
+  engine                          = "aurora-mysql"
+  engine_version                  = "5.7.12"
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.spinnaker.id
 
   /*
@@ -169,12 +180,12 @@ resource "aws_rds_cluster" "spinnaker" {
 }
 
 resource "aws_rds_cluster_instance" "spinnaker-db" {
-  count              = 2
-  identifier         = "spinnaker-db-dev-${count.index}"
-  cluster_identifier = aws_rds_cluster.spinnaker.id
-  instance_class     = "db.t3.medium"
-  engine             = "aurora-mysql"
-  engine_version     = "5.7.12"
+  count                   = 2
+  identifier              = "spinnaker-db-dev-${count.index}"
+  cluster_identifier      = aws_rds_cluster.spinnaker.id
+  instance_class          = "db.t3.medium"
+  engine                  = "aurora-mysql"
+  engine_version          = "5.7.12"
   db_parameter_group_name = aws_db_parameter_group.spinnaker.id
 
   publicly_accessible = true

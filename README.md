@@ -117,7 +117,7 @@ Unfortunately there's no easy way to bootstrap the Clouddriver database that Spi
 1. Run the `./deploy-spinnaker.sh` script from the previous section again. This punches a hole in the firewall with your public IP.
 1. Connect to the database via the CLI.
 1. Execute the SQL in `bootstrap.sql`.
-
+1. Run 
 
 ## Notes
 k8s stuff:
