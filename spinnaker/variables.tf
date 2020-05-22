@@ -15,3 +15,23 @@ variable "region" {
 variable "oidc_endpoint" {
   type = string
 }
+
+variable "spinnaker_oauth_client_id" {
+  type = string
+}
+
+variable "spinnaker_oauth_client_secret" {
+  type = string
+}
+
+variable "spinnaker_oauth_access_token_uri" {
+  type = string
+}
+
+variable "spinnaker_oauth_user_authorization_uri" {
+  type = string
+}
+
+variable "spinnaker_oauth_userinfo_uri" {
+  type = string
+}

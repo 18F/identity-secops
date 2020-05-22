@@ -63,10 +63,10 @@ resource "aws_route53_record" "v2-nested-ns" {
   ttl     = "30"
 
   records = [
-    "${aws_route53_zone.v2.name_servers.0}",
-    "${aws_route53_zone.v2.name_servers.1}",
-    "${aws_route53_zone.v2.name_servers.2}",
-    "${aws_route53_zone.v2.name_servers.3}",
+    "${aws_route53_zone.nested.name_servers.0}",
+    "${aws_route53_zone.nested.name_servers.1}",
+    "${aws_route53_zone.nested.name_servers.2}",
+    "${aws_route53_zone.nested.name_servers.3}",
   ]
 }
 

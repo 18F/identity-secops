@@ -1,6 +1,6 @@
 resource "aws_iam_user" "spinnaker-s3" {
-    name = "spinnaker-s3-bot"
-    path = "/spinnaker/"
+  name = "spinnaker-s3-bot"
+  path = "/spinnaker/"
 }
 
 resource "aws_iam_access_key" "spinnaker-s3" {
@@ -31,8 +31,8 @@ EOF
 }
 
 resource "aws_iam_user" "spinnaker-transit" {
-    name = "spinnaker-transit-bot"
-    path = "/spinnaker/"
+  name = "spinnaker-transit-bot"
+  path = "/spinnaker/"
 }
 
 resource "aws_iam_access_key" "spinnaker-transit" {
@@ -40,8 +40,8 @@ resource "aws_iam_access_key" "spinnaker-transit" {
 }
 
 resource "aws_iam_policy" "spinnaker-transit" {
-  name        = "spinnaker-transit"
-  path        = "/spinnaker/"
+  name = "spinnaker-transit"
+  path = "/spinnaker/"
 
   policy = <<EOF
 {
@@ -59,6 +59,147 @@ resource "aws_iam_policy" "spinnaker-transit" {
       ]
     }
   ]
+}
+EOF
+}
+
+resource "aws_iam_user_policy" "spinnaker-transit" {
+  name = "spinnaker-transit"
+  user = aws_iam_user.spinnaker-transit.name
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "route53:*",
+                "route53domains:*",
+                "elasticloadbalancing:*"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:CreateSecurityGroup",
+                "ec2:CreateTags",
+                "ec2:DeleteTags",
+                "ec2:DeleteSecurityGroup",
+                "ec2:Describe*",
+                "ec2:ModifyInstanceAttribute",
+                "ec2:ModifyNetworkInterfaceAttribute",
+                "ec2:RevokeSecurityGroupIngress"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:Add*",
+                "elasticloadbalancing:Create*",
+                "elasticloadbalancing:Delete*",
+                "elasticloadbalancing:DeregisterTargets",
+                "elasticloadbalancing:Describe*",
+                "elasticloadbalancing:Modify*",
+                "elasticloadbalancing:RegisterTargets",
+                "elasticloadbalancing:Remove*",
+                "elasticloadbalancing:Set*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_user_policy" "spinnaker-transit-waf" {
+  name = "spinnaker-transit-waf"
+  user = aws_iam_user.spinnaker-transit.name
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "waf-regional:GetWebACLForResource",
+                "waf-regional:GetWebACL",
+                "waf-regional:AssociateWebACL",
+                "waf-regional:DisassociateWebACL"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "waf:GetWebACL"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "shield:DescribeProtection",
+                "shield:GetSubscriptionState",
+                "shield:DeleteProtection",
+                "shield:CreateProtection",
+                "shield:DescribeSubscription",
+                "shield:ListProtections"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_user_policy" "spinnaker-transit-control" {
+  name = "spinnaker-transit-control"
+  user = aws_iam_user.spinnaker-transit.name
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "acm:DescribeCertificate",
+                "acm:ListCertificates",
+                "acm:GetCertificate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateServiceLinkedRole",
+                "iam:GetServerCertificate",
+                "iam:ListServerCertificates"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cognito-idp:DescribeUserPoolClient"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "tag:Get*"
+            ],
+            "Resource": "*"
+        }
+    ]
 }
 EOF
 }
