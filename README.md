@@ -119,6 +119,51 @@ Unfortunately there's no easy way to bootstrap the Clouddriver database that Spi
 1. Execute the SQL in `bootstrap.sql`.
 1. Run 
 
+### Spinnaker TODO
+
+In no particular order.
+
+* Use the [`aws_ip_ranges`](https://www.terraform.io/docs/providers/aws/d/ip_ranges.html) data source instead of [`aws_ranges.py`](spinnaker/aws-ranges.py).
+* Use the [`random.random_password`](https://www.terraform.io/docs/providers/random/r/password.html) provider for passwords.
+* Convert the [Kubernetes output locals](spinnaker/outputs.tf) to Kubernetes constructs.
+* Convert the Kubernetes files to Terraform.
+* Convert the [`bootstrap.sql`](spinnaker/bootstrap.sql) script to a [`null_resource` provider](https://stackoverflow.com/questions/49563301/terraform-local-exec-command-for-executing-mysql-script).
+* Convert the [`bootstrap.sql`](spinnaker/bootstrap.sql) script to a Terraform local variable so the passwords can be interpolated; i.e. `locals { bootstrap_script = "CREATE USER 'clouddriver' IDENTIFIED BY \"${random_password.mysql_password}\";"}`.
+* Create an input scheme so we don't have to rely on environment variables.
+* VPC Peering so the Aurora instance doesn't need to be exposed on the internet.
+
+Proposed `input.json` schema:
+
+```json
+{
+	"eks_vpc_id": "vpc-abc1234",
+	"base_domain": "identitysandbox.gov",
+	"cluster_name": "devops-test",
+	"region": "us-west-2",
+	"oidc_endpoint": "oidc.eks.us-west-2.amazonaws.com/id/ABCD1234",
+	"spinnaker_oauth_client_id": "spinnaker-dev",
+	"spinnaker_oauth_client_secret": "pass",
+	"spinnaker_oauth_access_token_uri": "https://localhost/oauth/token",
+	"spinnaker_oauth_user_authorization_uri": "https://localhost/userinfo",
+	"spinnaker_oauth_userinfo_uri": "https://localhost/oauth/authorize"
+}
+```
+
+By having a set input schema, you could do something like this:
+
+```hcl
+data "external" "inputs" {
+  program = ["cat", "${path.root}/input.json"]
+}
+
+resource "aws_route53_zone" "v2" {
+  name = "v2.${data.external.inputs.result.base_domain}"
+  // ...
+}
+```
+
+The `input.json` could be dynamically generated and version controlled external to the Spinnaker deployment, making it a bit easier to deploy. Unfortunately, we can't easily work with the AWS STS and OAuth2 client information, so that will absolutely have to be passed in, there's no Terraform provider for OAuth2 implementations and the AWS STS information has to be preexisting in the environment.
+
 ## Notes
 k8s stuff:
 * https://blog.gruntwork.io/comprehensive-guide-to-eks-worker-nodes-94e241092cbe#f8b9
