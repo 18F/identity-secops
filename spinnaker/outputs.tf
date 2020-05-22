@@ -267,7 +267,6 @@ spec:
         - name: alb-ingress-controller
           resources:
             limits:
-              cpu: "500m"
               memory: "512Mi"
           args:
             - --ingress-class=alb

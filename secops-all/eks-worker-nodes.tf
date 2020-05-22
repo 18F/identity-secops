@@ -12,7 +12,7 @@ resource "aws_eks_node_group" "secops" {
 
   scaling_config {
     desired_size = 4
-    max_size     = 6
+    max_size     = 8
     min_size     = 2
   }
 
