@@ -119,6 +119,10 @@ Unfortunately there's no easy way to bootstrap the Clouddriver database that Spi
 1. Execute the SQL in `bootstrap.sql`.
 1. Run 
 
+**Configuring Spinnaker**
+
+It's pretty straightforward, the Spinnaker configuration is a declaritive manifest that's an [output of Terraform](spinnaker/outputs.tf). The entire configuration lives there, and the [Armory docs](https://docs.armory.io/operator_reference/operator-config/) are a great place to go and see an explict reference, where things live, and how to configure Spinnaker as a whole. Currently we're using the OSS Spinnaker distribution with no customization.
+
 ### Spinnaker TODO
 
 In no particular order.
