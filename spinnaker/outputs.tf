@@ -1,31 +1,109 @@
+# we're reading in the manually generated kubeconfig file for spinnaker
+data "local_file" "kubeconfig" {
+  filename = "${path.root}/kubeconfig.yaml"
+}
+
 locals {
   # see the docs on what to do with this.
   spinnaker_service = <<SPINNAKEREOF
-apiVersion: spinnaker.armory.io/v1alpha2
+apiVersion: spinnaker.io/v1alpha2
 kind: SpinnakerService
 metadata:
   name: spinnaker
   namespace: identity-system
 spec:
   spinnakerConfig:
+    files:
+      kubeconfig-dev: |
+${data.local_file.kubeconfig.content}
     config:
-      version: 2.19.8
+      version: 1.20.3
+      features:
+        artifactsRewrite: true
+      providers:
+        kubernetes:
+          enabled: true
+          primaryAccount: dev
+          accounts:
+          - name: dev
+            providerVersion: V2
+            serviceAccount: true
+        dockerRegistry:
+          enabled: true
+          primaryAccount: logindotgov-demo
+          accounts:
+          - name: logindotgov-demo
+            address: https://index.docker.io
+            email: "identity-devops@login.gov"
+            username: logindotgovrobot
+            password: "" # todo (mxplusb): variablise this.
+            repositories:
+            - logindotgov/pretend-app
+      artifacts:
+        github:
+          enabled: true
+          accounts:
+          - name: 18f
+            username: identity-servers
+            password: "" # todo (mxplusb): variablise this.
       deploymentEnvironment:
         customSizing:
           spin-clouddriver:
-            replicas: 3
+            replicas: 1
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 4Gi
           spin-deck:
-            replicas: 3
+            replicas: 1
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 2Gi
           spin-gate:
-            replicas: 3
+            replicas: 1
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 2Gi
           spin-echo:
-            replicas: 3
+            replicas: 1
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 2Gi
           spin-front50:
-            replicas: 3
+            replicas: 1
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 2Gi
           spin-rosco:
-            replicas: 3
+            replicas: 1
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 2Gi
           spin-orca:
-            replicas: 3
+            replicas: 1
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 2Gi
       persistentStorage:
         persistentStoreType: s3
         s3:
@@ -123,7 +201,9 @@ spec:
             redis: false
       rosco: {}  
     service-settings:
-      clouddriver: {}
+      clouddriver:
+        kubernetes:
+          serviceAccountName: spinnaker-service-account
       deck: {}
       echo: {}
       fiat: {}

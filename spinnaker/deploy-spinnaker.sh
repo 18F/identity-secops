@@ -35,6 +35,7 @@ REQUIREDBINARIES="
      aws
      kubectl
      jq
+     yq
 "
 for i in ${REQUIREDBINARIES} ; do
      checkbinary "$i"
@@ -58,6 +59,11 @@ fi
 # clean up tfstate files so that we get them from the backend
 find . -name terraform.tfstate -print0 | xargs -0 rm
 
+# generate a spartan kubeconfig file for spinnaker.
+# and add 8 spaces because rendering is hard...
+aws eks update-kubeconfig --name "$TF_VAR_cluster_name" --kubeconfig kubeconfig.yaml
+sed -i -e 's/^/        /' kubeconfig.yaml
+
 # set it up with the s3 backend, push into the directory.
 terraform init -backend-config="bucket=$BUCKET" \
       -backend-config="key=tf-state/$TF_VAR_cluster_name" \
@@ -72,6 +78,9 @@ HOSTED_ZONE=$(aws route53 list-hosted-zones | jq -r --arg base_domain $BASE_DOMA
 okay_to_fail terraform import aws_route53_zone.dns $HOSTED_ZONE
 
 terraform apply
+
+# remove the kube config file so it's not in git.
+rm kubeconfig*
 
 # apply base
 kubectl apply -f "." --wait

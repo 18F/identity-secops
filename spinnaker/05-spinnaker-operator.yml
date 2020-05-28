@@ -1,14 +1,14 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: spinnakerservices.spinnaker.armory.io
+  name: spinnakerservices.spinnaker.io
 spec:
   additionalPrinterColumns:
   - JSONPath: .status.version
     description: Version
     name: version
     type: string
-  - JSONPath: .status.lastConfigurationTime
+  - JSONPath: .status.lastDeployed.config.lastUpdatedAt
     description: Last Configured
     name: lastConfigured
     type: date
@@ -29,7 +29,7 @@ spec:
     name: apiUrl
     priority: 1
     type: string
-  group: spinnaker.armory.io
+  group: spinnaker.io
   names:
     kind: SpinnakerService
     listKind: SpinnakerServiceList
@@ -59,6 +59,15 @@ spec:
         spec:
           description: SpinnakerServiceSpec defines the desired state of SpinnakerService
           properties:
+            accounts:
+              properties:
+                dynamic:
+                  description: Enable accounts to be added dynamically
+                  type: boolean
+                enabled:
+                  description: Enable the injection of SpinnakerAccount
+                  type: boolean
+              type: object
             expose:
               description: ExposeConfig represents the configuration for exposing
                 Spinnaker
@@ -96,6 +105,62 @@ spec:
                 type:
                   type: string
               type: object
+            kustomize:
+              additionalProperties:
+                properties:
+                  deployment:
+                    properties:
+                      patches:
+                        description: Patches is a list of patches, where each one
+                          can be either a Strategic Merge Patch or a JSON patch. Each
+                          patch can be applied to multiple target objects.
+                        items:
+                          type: string
+                        type: array
+                      patchesJson6902:
+                        description: JSONPatches is a list of JSONPatch for applying
+                          JSON patch. Format documented at https://tools.ietf.org/html/rfc6902
+                          and http://jsonpatch.com
+                        type: string
+                      patchesStrategicMerge:
+                        description: PatchesStrategicMerge specifies the relative
+                          path to a file containing a strategic merge patch.  Format
+                          documented at https://github.com/kubernetes/community/blob/master/contributors/devel/strategic-merge-patch.md
+                          URLs and globs are not supported.
+                        items:
+                          description: PatchStrategicMerge represents a relative path
+                            to a strategic merge patch with the format https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md
+                          type: string
+                        type: array
+                    type: object
+                  service:
+                    properties:
+                      patches:
+                        description: Patches is a list of patches, where each one
+                          can be either a Strategic Merge Patch or a JSON patch. Each
+                          patch can be applied to multiple target objects.
+                        items:
+                          type: string
+                        type: array
+                      patchesJson6902:
+                        description: JSONPatches is a list of JSONPatch for applying
+                          JSON patch. Format documented at https://tools.ietf.org/html/rfc6902
+                          and http://jsonpatch.com
+                        type: string
+                      patchesStrategicMerge:
+                        description: PatchesStrategicMerge specifies the relative
+                          path to a file containing a strategic merge patch.  Format
+                          documented at https://github.com/kubernetes/community/blob/master/contributors/devel/strategic-merge-patch.md
+                          URLs and globs are not supported.
+                        items:
+                          description: PatchStrategicMerge represents a relative path
+                            to a strategic merge patch with the format https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md
+                          type: string
+                        type: array
+                    type: object
+                type: object
+              description: Patch Kustomization of service and deployment per service
+              type: object
             spinnakerConfig:
               properties:
                 config:
@@ -110,7 +175,159 @@ spec:
                   description: Service profiles will be parsed as YAML
                   type: object
                 service-settings:
+                  additionalProperties: {}
                   description: Parsed service settings - comments are stripped
+                  type: object
+              type: object
+            validation:
+              description: validation settings for the deployment
+              properties:
+                canary:
+                  additionalProperties:
+                    properties:
+                      enabled:
+                        description: Enable or disable validation, defaults to false
+                        type: boolean
+                      failOnError:
+                        description: Report errors but do not fail validation, defaults
+                          to true
+                        type: boolean
+                      frequencySeconds:
+                        anyOf:
+                        - type: string
+                        - type: integer
+                        description: Number of seconds between each validation
+                    required:
+                    - enabled
+                    type: object
+                  type: object
+                ci:
+                  additionalProperties:
+                    properties:
+                      enabled:
+                        description: Enable or disable validation, defaults to false
+                        type: boolean
+                      failOnError:
+                        description: Report errors but do not fail validation, defaults
+                          to true
+                        type: boolean
+                      frequencySeconds:
+                        anyOf:
+                        - type: string
+                        - type: integer
+                        description: Number of seconds between each validation
+                    required:
+                    - enabled
+                    type: object
+                  type: object
+                failFast:
+                  description: Fail validation on the first failed validation, defaults
+                    to false
+                  type: boolean
+                failOnError:
+                  description: Report errors but do not fail validation, defaults
+                    to true
+                  type: boolean
+                frequencySeconds:
+                  anyOf:
+                  - type: string
+                  - type: integer
+                  description: Number of seconds between each validation
+                metricStores:
+                  additionalProperties:
+                    properties:
+                      enabled:
+                        description: Enable or disable validation, defaults to false
+                        type: boolean
+                      failOnError:
+                        description: Report errors but do not fail validation, defaults
+                          to true
+                        type: boolean
+                      frequencySeconds:
+                        anyOf:
+                        - type: string
+                        - type: integer
+                        description: Number of seconds between each validation
+                    required:
+                    - enabled
+                    type: object
+                  type: object
+                notifications:
+                  additionalProperties:
+                    properties:
+                      enabled:
+                        description: Enable or disable validation, defaults to false
+                        type: boolean
+                      failOnError:
+                        description: Report errors but do not fail validation, defaults
+                          to true
+                        type: boolean
+                      frequencySeconds:
+                        anyOf:
+                        - type: string
+                        - type: integer
+                        description: Number of seconds between each validation
+                    required:
+                    - enabled
+                    type: object
+                  type: object
+                persistentStorage:
+                  additionalProperties:
+                    properties:
+                      enabled:
+                        description: Enable or disable validation, defaults to false
+                        type: boolean
+                      failOnError:
+                        description: Report errors but do not fail validation, defaults
+                          to true
+                        type: boolean
+                      frequencySeconds:
+                        anyOf:
+                        - type: string
+                        - type: integer
+                        description: Number of seconds between each validation
+                    required:
+                    - enabled
+                    type: object
+                  type: object
+                providers:
+                  additionalProperties:
+                    properties:
+                      enabled:
+                        description: Enable or disable validation, defaults to false
+                        type: boolean
+                      failOnError:
+                        description: Report errors but do not fail validation, defaults
+                          to true
+                        type: boolean
+                      frequencySeconds:
+                        anyOf:
+                        - type: string
+                        - type: integer
+                        description: Number of seconds between each validation
+                    required:
+                    - enabled
+                    type: object
+                  type: object
+                pubsub:
+                  additionalProperties:
+                    properties:
+                      enabled:
+                        description: Enable or disable validation, defaults to false
+                        type: boolean
+                      failOnError:
+                        description: Report errors but do not fail validation, defaults
+                          to true
+                        type: boolean
+                      frequencySeconds:
+                        anyOf:
+                        - type: string
+                        - type: integer
+                        description: Number of seconds between each validation
+                    required:
+                    - enabled
+                    type: object
+                  type: object
               type: object
           required:
           - spinnakerConfig
@@ -118,16 +335,25 @@ spec:
         status:
           description: SpinnakerServiceStatus defines the observed state of SpinnakerService
           properties:
+            accountCount:
+              description: Number of accounts
+              type: integer
             apiUrl:
               description: Exposed Gate URL
               type: string
-            lastConfigHash:
-              description: Last deployed hash
-              type: string
-            lastConfigurationTime:
-              description: Last time the configuration was updated
-              format: date-time
-              type: string
+            lastDeployed:
+              additionalProperties:
+                properties:
+                  hash:
+                    type: string
+                  lastUpdatedAt:
+                    format: date-time
+                    type: string
+                required:
+                - hash
+                type: object
+              description: Last deployed hashes
+              type: object
             serviceCount:
               description: Number of services in Spinnaker
               type: integer
