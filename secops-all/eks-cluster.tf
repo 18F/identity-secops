@@ -22,6 +22,7 @@ resource "aws_eks_cluster" "secops" {
   depends_on = [
     aws_iam_role_policy_attachment.secops-cluster-AmazonEKSClusterPolicy,
     aws_iam_role_policy_attachment.secops-cluster-AmazonEKSServicePolicy,
+    aws_iam_role_policy_attachment.secops-cluster-AmazonEC2RoleforSSM,
   ]
 }
 
@@ -52,6 +53,40 @@ resource "aws_iam_role_policy_attachment" "secops-cluster-AmazonEKSClusterPolicy
 resource "aws_iam_role_policy_attachment" "secops-cluster-AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
   role       = aws_iam_role.secops-cluster.name
+}
+
+resource "aws_iam_role_policy_attachment" "secops-cluster-AmazonEC2RoleforSSM" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2RoleforSSM"
+  role       = aws_iam_role.secops-cluster.name
+}
+
+resource "aws_iam_openid_connect_provider" "oidc" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = []
+  url             = "${aws_eks_cluster.secops.identity.0.oidc.0.issuer}"
+}
+
+resource "aws_iam_role" "ssm-agent" {
+  assume_role_policy = "${data.aws_iam_policy_document.ssm-assumption.json}"
+  name               = "ssm-agent"
+}
+
+data "aws_iam_policy_document" "ssm-assumption" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.oidc.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:identity-system:ssm-agent"]
+    }
+
+    principals {
+      identifiers = ["${aws_iam_openid_connect_provider.oidc.arn}"]
+      type        = "Federated"
+    }
+  }
 }
 
 resource "aws_security_group" "secops-cluster" {

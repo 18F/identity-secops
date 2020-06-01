@@ -4,8 +4,6 @@
 
 locals {
   config_map_aws_auth = <<CONFIGMAPAWSAUTH
-
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -20,9 +18,19 @@ data:
         - system:nodes
 CONFIGMAPAWSAUTH
 
+  ssm_agent_serviceaccount = <<SSMEOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: ${aws_iam_role.ssm-agent.arn}
+  name: ssm-agent
+  namespace: identity-system
+secrets:
+- name: ssm-agent
+SSMEOF
+
   kubeconfig = <<KUBECONFIG
-
-
 apiVersion: v1
 clusters:
 - cluster:
