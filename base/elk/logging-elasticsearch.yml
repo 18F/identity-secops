@@ -124,7 +124,7 @@ spec:
         securityContext:
           runAsUser: 0
           privileged: true
-        image: "docker.elastic.co/elasticsearch/elasticsearch:7.6.2"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:7.7.1"
         imagePullPolicy: "IfNotPresent"
         command: ["sysctl", "-w", "vm.max_map_count=262144"]
         resources:
@@ -138,7 +138,7 @@ spec:
             - ALL
           runAsNonRoot: true
           runAsUser: 1000
-        image: "docker.elastic.co/elasticsearch/elasticsearch:7.6.2"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:7.7.1"
         imagePullPolicy: "IfNotPresent"
         readinessProbe:
           exec:
@@ -147,32 +147,53 @@ spec:
               - -c
               - |
                 #!/usr/bin/env bash -e
-                # If the node is starting up wait for the cluster to be ready (request params: 'wait_for_status=green&timeout=1s' )
+                # If the node is starting up wait for the cluster to be ready (request params: "wait_for_status=green&timeout=1s" )
                 # Once it has started only check that the node itself is responding
                 START_FILE=/tmp/.es_start_file
 
                 http () {
-                    local path="${1}"
-                    if [ -n "${ELASTIC_USERNAME}" ] && [ -n "${ELASTIC_PASSWORD}" ]; then
-                      BASIC_AUTH="-u ${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}"
-                    else
-                      BASIC_AUTH=''
-                    fi
-                    curl -XGET -s -k --fail ${BASIC_AUTH} http://127.0.0.1:9200${path}
+                  local path="${1}"
+                  local args="${2}"
+                  set -- -XGET -s
+
+                  if [ "$args" != "" ]; then
+                    set -- "$@" $args
+                  fi
+
+                  if [ -n "${ELASTIC_USERNAME}" ] && [ -n "${ELASTIC_PASSWORD}" ]; then
+                    set -- "$@" -u "${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}"
+                  fi
+
+                  curl --output /dev/null -k "$@" "http://127.0.0.1:9200${path}"
                 }
 
                 if [ -f "${START_FILE}" ]; then
-                    echo 'Elasticsearch is already running, lets check the node is healthy and there are master nodes available'
-                    http "/_cluster/health?timeout=0s"
+                  echo 'Elasticsearch is already running, lets check the node is healthy'
+                  HTTP_CODE=$(http "/" "-w %{http_code}")
+                  RC=$?
+                  if [[ ${RC} -ne 0 ]]; then
+                    echo "curl --output /dev/null -k -XGET -s -w '%{http_code}' \${BASIC_AUTH} http://127.0.0.1:9200/ failed with RC ${RC}"
+                    exit ${RC}
+                  fi
+                  # ready if HTTP code 200, 503 is tolerable if ES version is 6.x
+                  if [[ ${HTTP_CODE} == "200" ]]; then
+                    exit 0
+                  elif [[ ${HTTP_CODE} == "503" && "7" == "6" ]]; then
+                    exit 0
+                  else
+                    echo "curl --output /dev/null -k -XGET -s -w '%{http_code}' \${BASIC_AUTH} http://127.0.0.1:9200/ failed with HTTP code ${HTTP_CODE}"
+                    exit 1
+                  fi
+
                 else
-                    echo 'Waiting for elasticsearch cluster to become ready (request params: "wait_for_status=green&timeout=1s" )'
-                    if http "/_cluster/health?wait_for_status=green&timeout=1s" ; then
-                        touch ${START_FILE}
-                        exit 0
-                    else
-                        echo 'Cluster is not yet ready (request params: "wait_for_status=green&timeout=1s" )'
-                        exit 1
-                    fi
+                  echo 'Waiting for elasticsearch cluster to become ready (request params: "wait_for_status=green&timeout=1s" )'
+                  if http "/_cluster/health?wait_for_status=green&timeout=1s" "--fail" ; then
+                    touch ${START_FILE}
+                    exit 0
+                  else
+                    echo 'Cluster is not yet ready (request params: "wait_for_status=green&timeout=1s" )'
+                    exit 1
+                  fi
                 fi
           failureThreshold: 3
           initialDelaySeconds: 10
@@ -220,13 +241,16 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "elasticsearch-logging-lcxvz-test"
+  name: "elasticsearch-logging-ydhyz-test"
   annotations:
     "helm.sh/hook": test-success
 spec:
+  securityContext:
+    fsGroup: 1000
+    runAsUser: 1000
   containers:
-  - name: "elasticsearch-logging-crqso-test"
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.6.2"
+  - name: "elasticsearch-logging-mriuj-test"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.7.1"
     command:
       - "sh"
       - "-c"

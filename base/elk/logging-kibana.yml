@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kibana-kibana
-  labels:
+  labels: 
     app: kibana
     release: "kibana"
     heritage: Helm
@@ -24,9 +24,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kibana-kibana
-  labels:
+  labels: 
     app: kibana
     release: "kibana"
+    heritage: Helm
 spec:
   replicas: 1
   strategy:
@@ -54,7 +55,7 @@ spec:
             - ALL
           runAsNonRoot: true
           runAsUser: 1000
-        image: "docker.elastic.co/kibana/kibana:7.6.2"
+        image: "docker.elastic.co/kibana/kibana:7.7.1"
         imagePullPolicy: "IfNotPresent"
         env:
           - name: ELASTICSEARCH_HOSTS
@@ -77,7 +78,7 @@ spec:
                 #!/usr/bin/env bash -e
                 http () {
                     local path="${1}"
-                    set -- -XGET -s --fail
+                    set -- -XGET -s --fail -L
 
                     if [ -n "${ELASTICSEARCH_USERNAME}" ] && [ -n "${ELASTICSEARCH_PASSWORD}" ]; then
                       set -- "$@" -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}"
