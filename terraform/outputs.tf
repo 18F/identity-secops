@@ -32,25 +32,34 @@ data:
   #       - system:masters
 CONFIGMAPAWSAUTH
 
-#   idp_db_service = <<DBSERVICE
-# apiVersion: v1
-# kind: Service
-# metadata: 
-#   labels: 
-#     name: idp-postgres
-#   name: idp-postgres
-# spec: 
-#   type: ExternalName
-#   externalName: ${aws_db_instance.idp.address}
-#   ports: 
-#     - port: 5432
-#       protocol: TCP
-#       targetPort: ${aws_db_instance.idp.port}
-# DBSERVICE
+  idp_db_configmap = <<DBCONFIGMAP
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idp-postgres
+  namespace: idp
+  labels:
+    name: idp-postgres
+data:
+  hostname: "${aws_db_instance.idp.address}"
+  port: "${aws_db_instance.idp.port}"
+DBCONFIGMAP
 
-#   idp_redis_service = <<REDISSERVICE
-# XXX
-# REDISSERVICE
+  idp_redis_service = <<REDISSERVICE
+apiVersion: v1
+kind: Service
+metadata: 
+  labels: 
+    name: idp-redis
+  name: idp-redis
+spec: 
+  type: ExternalName
+  externalName: ${aws_elasticache_replication_group.idp.primary_endpoint_address}
+  ports: 
+    - port: 6379
+      protocol: TCP
+      targetPort: 6379
+REDISSERVICE
 
 }
 
@@ -62,7 +71,10 @@ output "cluster_arn" {
   value = aws_eks_cluster.secops.arn
 }
 
-# output "idp_db_service" {
-#   value = local.idp_redis_service
-# }
+output "idp_db_configmap" {
+  value = local.idp_db_configmap
+}
 
+output "idp_redis_service" {
+  value = local.idp_redis_service
+}

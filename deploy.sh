@@ -12,7 +12,7 @@ if [ -z "$1" ]; then
      echo "example: ./deploy.sh secops-dev dev"
      exit 1
 else
-     if [ ! -z "$2" ] ; then
+     if [ -n "$2" ] ; then
         if [ ! -d "$2" ] ; then
           echo "cluster type not found: $2"
           exit 1
@@ -66,11 +66,10 @@ terraform apply
 # and also maps IAM roles to users.
 aws eks update-kubeconfig --name "$TF_VAR_cluster_name"
 
-# update the configmap.
-rm -f /tmp/configmap.yml
-terraform output config_map_aws_auth > /tmp/configmap.yml
-kubectl apply -f /tmp/configmap.yml
-rm -f /tmp/configmap.yml
+# update the kubernetes services/configmap using terraform data.
+terraform output config_map_aws_auth | kubectl apply -f -
+terraform output idp_redis_service | kubectl apply -f - -n idp
+terraform output idp_db_configmap | kubectl apply -f - -n idp
 popd
 
 # this turns on the EBS persistent volume stuff and make it the default
@@ -81,8 +80,8 @@ else
 	kubectl apply -f "$RUN_BASE/install/ebs_storage_class.yml"
 fi
 if kubectl get sc | grep -E '^gp2.*default' >/dev/null ; then
-	kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 	kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+  kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 fi
 
 # apply k8s config for this cluster
@@ -91,4 +90,3 @@ if [ -z "$2" ] ; then
 else
   kubectl apply -k "$RUN_BASE/install-$2"
 fi
-
