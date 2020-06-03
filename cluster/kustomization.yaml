@@ -3,6 +3,7 @@ bases:
   - ../base/clamav/
   - ../base/flagger/
   - ../base/elk/
+  - ../base/elk/filebeat/
   - ../base/dashboard/
   - ./common/
   - ./idp/

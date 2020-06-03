@@ -4,5 +4,3 @@ resources:
 - logging-elasticsearch.yml
 - logging-kibana.yml
 - logging-logstash.yml
-bases:
-  - filebeat
