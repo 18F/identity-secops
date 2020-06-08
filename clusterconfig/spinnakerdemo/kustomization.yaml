@@ -1,0 +1,5 @@
+bases:
+- ../base
+images:
+  - name: logindotgov/secops-clamav
+    newTag: inotify
