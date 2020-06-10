@@ -6,7 +6,7 @@ metadata:
   name: falco
   labels:
     app: falco
-    chart: "falco-1.1.7"
+    chart: "falco-1.1.8"
     release: "falco"
     heritage: "Helm"
 ---
@@ -17,7 +17,7 @@ metadata:
   name: falco
   labels:
     app: falco
-    chart: "falco-1.1.7"
+    chart: "falco-1.1.8"
     release: "falco"
     heritage: "Helm"
 data:
@@ -2145,7 +2145,7 @@ metadata:
   name: falco
   labels:
     app: falco
-    chart: "falco-1.1.7"
+    chart: "falco-1.1.8"
     release: "falco"
     heritage: "Helm"
 rules:
@@ -2180,7 +2180,7 @@ metadata:
   name: falco
   labels:
     app: falco
-    chart: "falco-1.1.7"
+    chart: "falco-1.1.8"
     release: "falco"
     heritage: "Helm"
 subjects:
@@ -2199,7 +2199,7 @@ metadata:
   name: falco
   labels:
     app: falco
-    chart: "falco-1.1.7"
+    chart: "falco-1.1.8"
     release: "falco"
     heritage: "Helm"
 spec:
@@ -2214,7 +2214,7 @@ spec:
         app: falco
         role: security
       annotations:
-        checksum/config: c0136457da631246db656ebb6aa43d7988240c20322d9efcd095c2e1f9b61909
+        checksum/config: d747364621fc343918b041220fb04507c147f475e2bcf763f80644a91d7555cc
         checksum/rules: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
     spec:
       serviceAccountName: falco
@@ -2225,7 +2225,7 @@ spec:
           key: node-role.kubernetes.io/master
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco:0.26.7
+          image: docker.io/falcosecurity/falco:0.23.0
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -2239,7 +2239,7 @@ spec:
           args:
             - /usr/bin/falco
             - --cri
-            - /host/run/containerd/containerd.sock
+            - /run/containerd/containerd.sock
             - -K
             - /var/run/secrets/kubernetes.io/serviceaccount/token
             - -k
@@ -2269,6 +2269,9 @@ spec:
               readOnly: true
             - mountPath: /dev/shm
               name: dshm
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
             - mountPath: /etc/falco
               name: config-volume
       volumes:
@@ -2296,6 +2299,9 @@ spec:
         - name: usr-fs
           hostPath:
             path: /usr
+        - name: etc-fs
+          hostPath:
+            path: /etc
         - name: config-volume
           configMap:
             name: falco
