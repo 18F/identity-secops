@@ -193,6 +193,15 @@ resource "aws_route53_zone" "v2" {
 
 The `input.json` could be dynamically generated and version controlled external to the Spinnaker deployment, making it a bit easier to deploy. Unfortunately, we can't easily work with the AWS STS and OAuth2 client information, so that will absolutely have to be passed in, there's no Terraform provider for OAuth2 implementations and the AWS STS information has to be preexisting in the environment.
 
+## Upgrading EKS
+
+To do this:
+  * Update the version in `terraform/eks-cluster.tf`.
+  * Get all the nodes with `kubectl get nodes --output=json | jq -r '.items[] | .metadata.name'`
+  * Run `./deploy.sh <clustername>`.
+  * Go into the console and click into the node group, click on upgrade.
+  * Celebrate!  Everything should be running the latest/greatest stuff shortly.
+
 ## Notes
 k8s stuff:
 * https://blog.gruntwork.io/comprehensive-guide-to-eks-worker-nodes-94e241092cbe#f8b9

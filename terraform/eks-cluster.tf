@@ -17,7 +17,7 @@ resource "aws_eks_cluster" "secops" {
     #prevent_destroy = true
   }
 
-  version = "1.15"
+  version = "1.16"
 
   depends_on = [
     aws_iam_role_policy_attachment.secops-cluster-AmazonEKSClusterPolicy,
