@@ -1,8 +1,0 @@
-resources:
-- clamav-daemonset.yml
-- ebs_storage_class.yml
-- logging-elasticsearch.yml
-- logging-kibana.yml
-- logging-logstash.yml
-- falco.yml
-

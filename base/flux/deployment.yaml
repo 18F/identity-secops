@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flux
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flux
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3031"
+      labels:
+        app: flux
+    spec:
+      serviceAccountName: flux
+      volumes:
+        - name: kubedir
+          configMap:
+            name: flux-kube-config
+        - name: git-key
+          secret:
+            secretName: flux-git-deploy
+            defaultMode: 0400
+        - name: git-keygen
+          emptyDir:
+            medium: Memory
+      containers:
+        - name: flux
+          image: fluxcd/flux:1.15.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3030
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: 3030
+              path: /api/flux/v6/identity.pub
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              port: 3030
+              path: /api/flux/v6/identity.pub
+            initialDelaySeconds: 5
+            timeoutSeconds: 5              
+          volumeMounts:
+            - name: kubedir
+              mountPath: /root/.kubectl
+            - name: git-key
+              mountPath: /etc/fluxd/ssh
+              readOnly: true
+            - name: git-keygen
+              mountPath: /var/fluxd/keygen
+          env:
+            - name: KUBECONFIG
+              value: /root/.kubectl/kubeconfig.yaml
+          args:
+            - --listen-metrics=:3031
+            - --memcached-hostname=flux-memcached.flux-system
+            - --memcached-service=
+            - --git-poll-interval=5m
+            - --sync-interval=5m
+            - --ssh-keygen-dir=/var/fluxd/keygen
+            - --git-url=git@github.com:fluxcd/flux-get-started
+            - --git-branch=master
+            - --git-path=
+            - --sync-garbage-collection
+            - --git-readonly
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi

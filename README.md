@@ -11,6 +11,7 @@ to start automation to support IR and assessment work
 	  automatically.
 	* If Nessus dies, it should be restarted/rebuilt.
 * Secrets and maybe artifacts used for build/deploy should be persisted somewhere
+* Logging and security should be built in
 * System should be roughly generalizable to other purposes
 
 
@@ -27,15 +28,17 @@ to start automation to support IR and assessment work
 	* ~~get codepipeline to kick off builds~~
 	* ~~Do CI for nessus/clamav to push to docker hub~~
 	* Waiting for spinnaker work being done by Mike
+	* While waiting, try out flux!
 * Make sure that security is baked in
 	* IAM roles for access?
-	* Istio for limiting outbound access and who can talk to what service?
+	* Istio for limiting outbound access and who can talk to what service?  Maybe just Network Policies?
 	* Twistlock/Aqua/TenableCS for scanning containers after build?
 	* ~~clamav~~
 	* ~~falco~~
 * Figure out system for running k8s on local system too?
 * super-stretch goal:  make helm chart for identity-idp and see if it works!
 	* Mike and others are doing this
+	* Managed to get container working with https://github.com/18F/identity-idp/pull/3759
 
 ## Problems encountered so far
 * EKS/Fargate only works in us-east-* regions, we are in us-west-2.
@@ -55,23 +58,45 @@ to start automation to support IR and assessment work
   vs trunk-based development, standalone vs hub/spoke.
 	* Held a meeting, presented options, did exercise to surface consensus:
 	  https://docs.google.com/document/d/1OtMXGJynZYuagcsIMDV9IzJjRyNmxVNVXz9Y78gcfOA/
+* Spinnaker deploy seems to be broken
+	* removed remnants, tried out [fluxcd with flagger](https://github.com/fluxcd/flux)
 
 ## Process
 
-* `brew install kubectl`
-* `brew install aws-iam-authenticator`
+* `brew install kubectl aws-iam-authenticator fluxctl`
 * make sure that your environment is set up to point at the AWS account that you want
   the cluster to live with `AWS_PROFILE` or AWS Vault.
-* Deploy Kubernetes
-* Optionally, deploy Spinnaker.
+* Deploy Kubernetes (see below)
 
 ### Deploying Kubernetes
 
 * First time: `./setup.sh <clustername>` where `clustername` is something like `secops-dev` or `devops-test`
-* Deploys to already existing cluster:  `./deploy.sh <clustername>`
+  You can also select a cluster type with `./setup.sh <clustername> <clustertype>`, which will select the
+  `cluster-<clustertype>` directory for deploying stuff.  This lets you have a standalone or hub/spoke architecture.
+	* Once the cluster is up, use `fluxctl --k8s-fwd-ns=flux-system identity` to get a readonly deploy key
+	  to add to the git repo that the cluster is deployed from.  Once that is enabled, the code under the
+	  clustertype dir will be deployed automatically as you check it into git.
+	* Other repos can be deployed with flux as well.  Look at how `cluster/idp` is configured
+	  to deploy https://github.com/timothy-spencer/idp-dev to the idp namespace.  You can also
+	  look at https://github.com/timothy-spencer/idp-dev/workloads/idp-bluegreen for a very basic example of how to
+	  do blue/green deploys with tests and so on.
+* Update already existing cluster:  `./deploy.sh <clustername>`
 
-### Deploying Spinnaker
+### Deploying Notes
 
+This was based heavily off of the [fluxcd multi-tenancy template](https://github.com/fluxcd/multi-tenancy).
+Since we are not just deploying to one cluster, but to several, we have extended the setup to handle
+multiple cluster types.
+
+The underlying fluxcd stuff relies heavily on [kustomize](https://github.com/kubernetes-sigs/kustomize) to
+pull together and customize the various manifests out there.  We have been trying to keep our configuration
+rendered out into flat files rather than relying on remote repos or helm charts that may or may not be working.
+Wherever possible, we are using some sort of `render_<thing>.sh` script to render the file(s) out for that
+service.  In the cases where we have not, they are usually based on some prior art.  If you want to see what
+is being generated for a particular thing, you should be able to say something like
+`kustomize build cluster/` or `kustomize build base/elk` or whatever to see what is being applied.
+
+#### Spinnaker
 **Requirements:**
 * Kubernetes must be deployed.
 * You must have an existing, pre-deployed Route53 zone in the same AWS account you deploy both Kubernetes and Spinnaker to. The [`spinnaker/deploy-spinnaker.sh`](spinnaker/deploy-spinnaker.sh) script will be importing the Zone ID.
@@ -123,7 +148,7 @@ Unfortunately there's no easy way to bootstrap the Clouddriver database that Spi
 
 It's pretty straightforward, the Spinnaker configuration is a declaritive manifest that's an [output of Terraform](spinnaker/outputs.tf). The entire configuration lives there, and the [Armory docs](https://docs.armory.io/operator_reference/operator-config/) are a great place to go and see an explict reference, where things live, and how to configure Spinnaker as a whole. Currently we're using the OSS Spinnaker distribution with no customization.
 
-### Spinnaker TODO
+#### Spinnaker TODO
 
 In no particular order.
 
@@ -173,6 +198,12 @@ k8s stuff:
 * https://blog.gruntwork.io/comprehensive-guide-to-eks-worker-nodes-94e241092cbe#f8b9
 * https://aws.amazon.com/blogs/opensource/getting-started-istio-eks/
 * https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html
+* https://github.com/fluxcd/flux
+* https://github.com/fluxcd/multi-tenancy
+* https://github.com/fluxcd/multi-tenancy-team1
+* https://docs.flagger.app/tutorials/kubernetes-blue-green
+* https://aws.amazon.com/blogs/opensource/aws-service-operator-kubernetes-available/ (probably want to manage this externally, but interesting)
+* https://monzo.com/blog/controlling-outbound-traffic-from-kubernetes
 
 Nessus config stuff
 * setup for Docker example:  https://github.com/SteveMcGrath/docker-nessus_scanner
