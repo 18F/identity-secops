@@ -1,6 +1,6 @@
 
-#image:
-#  tag: 0.18.0
+image:
+  tag: 0.26.7
 
 ebpf:
   enabled: true

@@ -2225,7 +2225,7 @@ spec:
           key: node-role.kubernetes.io/master
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco:0.21.0
+          image: docker.io/falcosecurity/falco:0.26.7
           imagePullPolicy: IfNotPresent
           resources:
             limits:
