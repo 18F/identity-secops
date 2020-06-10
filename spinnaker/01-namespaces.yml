@@ -13,3 +13,18 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: identity-monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: identity-dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: identity-staging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: identity-prod

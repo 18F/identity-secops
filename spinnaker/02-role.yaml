@@ -53,7 +53,7 @@ rules:
   - get
   - create
 - apiGroups:
-  - spinnaker.armory.io
+  - spinnaker.io
   resources:
   - '*'
   - spinnakerservices
