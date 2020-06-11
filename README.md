@@ -27,17 +27,16 @@ to start automation to support IR and assessment work
 	* ~~put stuff into ECR~~
 	* ~~get codepipeline to kick off builds~~
 	* ~~Do CI for nessus/clamav to push to docker hub~~
-	* Waiting for spinnaker work being done by Mike
-	* While waiting, try out flux!
+	* ~~Waiting for spinnaker work being done by Mike~~
+	* ~~While waiting, try out flux!~~
 * Make sure that security is baked in
-	* IAM roles for access?
+	* ~~IAM roles for access?~~
 	* Istio for limiting outbound access and who can talk to what service?  Maybe just Network Policies?
 	* Twistlock/Aqua/TenableCS for scanning containers after build?
 	* ~~clamav~~
 	* ~~falco~~
 * Figure out system for running k8s on local system too?
 * super-stretch goal:  make helm chart for identity-idp and see if it works!
-	* Mike and others are doing this
 	* Managed to get container working with https://github.com/18F/identity-idp/pull/3759
 
 ## Problems encountered so far
@@ -58,8 +57,13 @@ to start automation to support IR and assessment work
   vs trunk-based development, standalone vs hub/spoke.
 	* Held a meeting, presented options, did exercise to surface consensus:
 	  https://docs.google.com/document/d/1OtMXGJynZYuagcsIMDV9IzJjRyNmxVNVXz9Y78gcfOA/
+* falco is now broken
+	* They changed their helm repo and how software is delivered, the lkm disappeared that it needed.
+	* Updated to latest helm repo, but their new system is broken:  https://github.com/falcosecurity/falco/issues/1255
 * Spinnaker deploy seems to be broken
 	* removed remnants, tried out [fluxcd with flagger](https://github.com/fluxcd/flux)
+	* spinnaker was deployed in the `devops-test` cluster in `identity-sandbox`, but I cannot make it work in `secops-dev`.
+	* spinnaker does not seem to be able to trigger off of new image builds.  Can see webhook happening in the logs, but no trigger?
 
 ## Process
 
