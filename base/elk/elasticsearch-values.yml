@@ -14,5 +14,32 @@ volumeClaimTemplate:
     requests:
       storage: 90Gi
 
+# This is how many ES nodes we want
 replicas: 3
+
+lifecycle:
+  postStart:
+    exec:
+      command:
+        - bash
+        - -c
+        - |
+          #!/bin/bash
+          # Add a lifecycle policy for 90 day retention
+          ES_URL=http://localhost:9200
+          while [[ "$(curl -s -o /dev/null -w '%{http_code}\n' $ES_URL)" != "200" ]]; do sleep 1; done
+          curl -X PUT "$ES_URL/_ilm/policy/expire90days?pretty" -H 'Content-Type: application/json' -d'
+          {
+            "policy": {
+              "phases": {
+                "delete": {
+                  "min_age": "90d",
+                  "actions": {
+                    "delete": {}
+                  }
+                }
+              }
+            }
+          }
+          '
 
