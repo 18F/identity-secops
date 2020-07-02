@@ -14,3 +14,5 @@ volumeClaimTemplate:
     requests:
       storage: 60Gi
 
+replicas: 6
+
