@@ -18,3 +18,13 @@ resulting base ELK stack.  However, if you want to change the config on a per-cl
 basis, you will need to do that in the `clusterconfig/clustername/kustomization.yaml`
 file.
 
+
+## Disk space
+
+Adding more disk space seems to be tricky.  The easiest way is to just add more nodes,
+but that burns up memory, and if the nodes are not loaded, that might be a waste of
+$$.
+
+The proper way to do this seems to be documented in a few ways here:
+https://serverfault.com/questions/955293/how-to-increase-disk-size-in-a-stateful-set
+
