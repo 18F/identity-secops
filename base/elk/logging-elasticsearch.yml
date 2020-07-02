@@ -25,7 +25,6 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    heritage: "Helm"
     release: "elasticsearch-logging"
     chart: "elasticsearch"
     app: "elasticsearch-master"
@@ -90,7 +89,7 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 30Gi
+          storage: 60Gi
   template:
     metadata:
       name: "elasticsearch-master"
@@ -119,12 +118,13 @@ spec:
                   - "elasticsearch-master"
       terminationGracePeriodSeconds: 120
       volumes:
+      enableServiceLinks: true
       initContainers:
       - name: configure-sysctl
         securityContext:
           runAsUser: 0
           privileged: true
-        image: "docker.elastic.co/elasticsearch/elasticsearch:7.7.1"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:7.8.0"
         imagePullPolicy: "IfNotPresent"
         command: ["sysctl", "-w", "vm.max_map_count=262144"]
         resources:
@@ -138,7 +138,7 @@ spec:
             - ALL
           runAsNonRoot: true
           runAsUser: 1000
-        image: "docker.elastic.co/elasticsearch/elasticsearch:7.7.1"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:7.8.0"
         imagePullPolicy: "IfNotPresent"
         readinessProbe:
           exec:
@@ -241,7 +241,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "elasticsearch-logging-ydhyz-test"
+  name: "elasticsearch-logging-newxm-test"
   annotations:
     "helm.sh/hook": test-success
 spec:
@@ -249,8 +249,8 @@ spec:
     fsGroup: 1000
     runAsUser: 1000
   containers:
-  - name: "elasticsearch-logging-mriuj-test"
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.7.1"
+  - name: "elasticsearch-logging-hwmak-test"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.8.0"
     command:
       - "sh"
       - "-c"
