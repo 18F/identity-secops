@@ -8,3 +8,4 @@ bases:
   - ../base/argocd/
   - ./common/
   - ./idp/
+  - ./cats/
