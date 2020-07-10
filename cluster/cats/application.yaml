@@ -22,7 +22,7 @@ spec:
       # Optional kustomize version. Note: version must be configured in argocd-cm ConfigMap
       #version: v3.5.4
       # Optional image name prefix
-      #namePrefix: prod-
+      namePrefix: prod-
       # Optional images passed to "kustomize edit set image".
       #images:
       #- logindotgov/pretend-app
