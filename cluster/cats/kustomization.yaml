@@ -1,3 +1,4 @@
+namespace: cats
 resources:
   - namespace.yaml
   - application.yaml
