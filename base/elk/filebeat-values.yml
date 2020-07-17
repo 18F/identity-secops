@@ -12,3 +12,5 @@ filebeatConfig:
       hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master.elk.svc:9200}'
 
     setup.ilm.policy_name: 'expire90days'
+    json.keys_under_root: true
+

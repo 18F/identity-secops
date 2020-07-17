@@ -34,6 +34,7 @@ data:
       hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master.elk.svc:9200}'
     
     setup.ilm.policy_name: 'expire90days'
+    json.keys_under_root: true
 ---
 # Source: filebeat/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -96,7 +97,7 @@ spec:
     metadata:
       annotations:
         
-        configChecksum: cea57a465c051688bd1e3a84c1d06838b663661a5434ff5ec940f684a9a99a1
+        configChecksum: 28a201b2b888d4364e65c4caae5ee7f50c7ba80f50ac7cc4a0ad4881ad0e29b
       name: "filebeat-filebeat"
       labels:
         app: "filebeat-filebeat"
