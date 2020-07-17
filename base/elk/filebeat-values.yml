@@ -6,13 +6,12 @@ filebeatConfig:
       - '*'
       processors:
       - add_kubernetes_metadata: ~
+      json:
+      - keys_under_root: true
 
     output.elasticsearch:
       host: '${NODE_NAME}'
       hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master.elk.svc:9200}'
 
     setup.ilm.policy_name: 'expire90days'
-    json.keys_under_root: true
-    json.add_error_key: true
-
 

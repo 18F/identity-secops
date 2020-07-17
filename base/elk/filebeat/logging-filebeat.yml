@@ -28,14 +28,14 @@ data:
       - '*'
       processors:
       - add_kubernetes_metadata: ~
+      json:
+      - keys_under_root: true
     
     output.elasticsearch:
       host: '${NODE_NAME}'
       hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master.elk.svc:9200}'
     
     setup.ilm.policy_name: 'expire90days'
-    json.keys_under_root: true
-    json.add_error_key: true
 ---
 # Source: filebeat/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -98,7 +98,7 @@ spec:
     metadata:
       annotations:
         
-        configChecksum: a73de2b1f6fee7d4b6b38c3569e2662a5a23af4767abf2c8d4be4421657e0cb
+        configChecksum: 5acdc7ef95adb766934c5f33d6caeca200046188a419f75bb4e39d15ccd7d9d
       name: "filebeat-filebeat"
       labels:
         app: "filebeat-filebeat"
