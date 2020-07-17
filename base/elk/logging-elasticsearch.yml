@@ -267,7 +267,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "elasticsearch-logging-nofih-test"
+  name: "elasticsearch-logging-cxoav-test"
   annotations:
     "helm.sh/hook": test-success
 spec:
@@ -275,7 +275,7 @@ spec:
     fsGroup: 1000
     runAsUser: 1000
   containers:
-  - name: "elasticsearch-logging-zmvot-test"
+  - name: "elasticsearch-logging-ssdhy-test"
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.8.0"
     command:
       - "sh"

@@ -6,8 +6,16 @@ filebeatConfig:
       - '*'
       processors:
       - add_kubernetes_metadata: ~
-      json:
-      - keys_under_root: true
+      - decode_json_fields:
+          fields: ["message"]
+          process_array: false
+          max_depth: 2
+          target: "json"
+          overwrite_keys: false
+          add_error_key: true
+      #json:
+      #- keys_under_root: true
+
 
     output.elasticsearch:
       host: '${NODE_NAME}'
