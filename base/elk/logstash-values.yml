@@ -10,3 +10,15 @@ service:
       port: 8080
       protocol: TCP
       targetPort: 8080
+
+logstashConfig:
+  logstash.yml: |
+     http.host: "0.0.0.0"
+     filter {
+       if [message] =~ "^\{" {
+         json {
+           source => "message"
+         }
+       }
+     }
+
