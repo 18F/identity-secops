@@ -35,6 +35,7 @@ data:
     
     setup.ilm.policy_name: 'expire90days'
     json.keys_under_root: true
+    json.add_error_key: true
 ---
 # Source: filebeat/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -97,7 +98,7 @@ spec:
     metadata:
       annotations:
         
-        configChecksum: 28a201b2b888d4364e65c4caae5ee7f50c7ba80f50ac7cc4a0ad4881ad0e29b
+        configChecksum: a73de2b1f6fee7d4b6b38c3569e2662a5a23af4767abf2c8d4be4421657e0cb
       name: "filebeat-filebeat"
       labels:
         app: "filebeat-filebeat"

@@ -13,4 +13,6 @@ filebeatConfig:
 
     setup.ilm.policy_name: 'expire90days'
     json.keys_under_root: true
+    json.add_error_key: true
+
 
