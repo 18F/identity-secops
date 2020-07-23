@@ -39,6 +39,10 @@ spec:
     kind: Deployment
   - group: 'apps'
     kind: StatefulSet
+  - group: 'apps'
+    kind: Ingress
+  - group: 'apps'
+    kind: Service
 
   # Enables namespace orphaned resource monitoring.
   orphanedResources:
