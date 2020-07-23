@@ -39,7 +39,7 @@ spec:
     kind: Deployment
   - group: 'apps'
     kind: StatefulSet
-  - group: ''
+  - group: '*'
     kind: Ingress
   - group: ''
     kind: Service
