@@ -94,8 +94,13 @@ variable "rds_storage_idp" {
 }
 
 variable "rds_username" {
+  # These are not actually used.  We update them after launching.
+  default = "upaya"
 }
+
 variable "rds_password" {
+  # These are not actually used.  We update them after launching.
+  default = "upayaupaya"
 }
 
 variable "rds_maintenance_window" {
