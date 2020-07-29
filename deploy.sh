@@ -84,15 +84,6 @@ if kubectl get sc | grep -E '^gp2.*default' >/dev/null ; then
   kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 fi
 
-# this turns on the ALB ingress support for the cluster
-if [ ! -f "$RUN_BASE/base/alb-ingress/alb-ingress-$TF_VAR_cluster_name.yaml" ] ; then
-	# we are missing an alb ingress for the cluster.  Generate one!
-	# XXX I bet this could be done with kustomize on a generic file somehow.  Brain not big enough to figure out.
-	pushd "$RUN_BASE/base/alb-ingress/"
-	./render-albingress.sh "$TF_VAR_cluster_name"
-fi
-kubectl apply -f "$RUN_BASE/base/alb-ingress/alb-ingress-$TF_VAR_cluster_name.yaml" -n kube-system
-
 # apply k8s config for this cluster
 if [ -z "$2" ] ; then
   kubectl apply -k "$RUN_BASE/install"
